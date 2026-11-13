@@ -34,7 +34,7 @@ Both pages use the same header and footer. `changes.html` loads the site's own `
 
 ## 4. Footer (`shared/footer.html`)
 The same on every page of every site:
-- The link row: D&D Toolbox · Wild Shape Beast List · Item Finder · Multiclass Planner (only once it's published) · Changes · Source code (the repo) · Report a problem (the repo's issues). Mark the current site with `aria-current="page"`.
+- The link row: D&D Toolbox · Wild Shape Beast List · Item Finder · Multiclass Planner · Changes · Source code (the repo) · Report a problem (the repo's issues). Mark the current site with `aria-current="page"`.
 - The license line, word for word, in the footer.
 - A site that needs a longer SRD attribution or extra credits keeps those in its About or Sources section. The footer line is the minimum.
 
