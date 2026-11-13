@@ -70,6 +70,17 @@ for site in SITES:
         strip = lambda t: re.sub(r"var OLD_KEY = [^;]*;", "", t)
         same = strip(mine) == strip(canon)
         (ok if same else bad)(site, f"site/{js} matches shared/{js}" if same else f"site/{js} differs from shared/{js}")
+    lic = repo / "LICENSE"
+    (ok if lic.exists() else bad)(site, "LICENSE present" if lic.exists() else "LICENSE missing (copy shared/LICENSE)")
+    chk = repo / "tools" / "check_site.py"
+    wf = (repo / ".github" / "workflows" / "pages.yml").read_text(encoding="utf-8")
+    good = chk.exists() and "check_site.py" in wf
+    (ok if good else bad)(site, "CI runs tools/check_site.py" if good else "tools/check_site.py missing or not run in pages.yml")
+    if site != "dnd":
+        heads = re.findall(r"^## (.+)$", (repo / "README.md").read_text(encoding="utf-8"), re.M)
+        want = ["Features", "Data and copyright", "Layout", "Run locally", "Credits and license"]
+        good = [h for h in heads if h in want] == want
+        (ok if good else bad)(site, "README sections in the standard order" if good else f"README sections {heads} (want {want})")
     toks = re.search(r":root\s*\{.*?\}", css, re.S)
     toks = toks.group(0) if toks else ""
     shared_toks = {k: v for k, v in re.findall(r"(--[\w-]+):\s*([^;]+);", toks) if not k.startswith("--src")}
@@ -87,12 +98,17 @@ for site in SITES:
         if "getItem('dnd.theme')" not in html: probs.append("no dnd.theme head script")
         if 'href="changes.html"' not in html: probs.append("no Changes link")
         if 'src="version.js?v=' not in html: probs.append("no version.js update notice")
+        if 'property="og:title"' not in html: probs.append("no og:title")
+        if 'name="theme-color"' not in html: probs.append("no theme-color")
         missing = [l for l in foot_links if f'href="{l}"' not in html and not (l.rstrip("/").endswith("/" + site) and 'href="./"' in html)]
         if missing: probs.append("footer missing " + ", ".join(m.replace(BASE, "") for m in missing))
         if page == "" and site != "dnd" and 'href="https://wernercd.github.io/dnd/"' not in html: probs.append("no back-link to hub")
         v = re.search(r'styles\.css\?v=([0-9a-z]+)', html)
         if v and v.group(1) != "dev" and not head.startswith(v.group(1)[:7]): probs.append(f"live page is {v.group(1)}, repo HEAD is {head}")
         (ok if not probs else bad)(site, f"/{page or ''} live" + ("" if not probs else ": " + "; ".join(probs)))
+    code, nf = fetch(BASE + site + "/no-such-page-xyz")
+    good = code == 404 and 'class="wrap hub-bar"' in nf
+    (ok if good else bad)(site, "custom 404 page live" if good else f"no custom 404 page (HTTP {code})")
     code, live_css = fetch(BASE + site + "/styles.css")
     (ok if shared_block(live_css) == canon_css else bad)(site, f"live styles.css carries shared {canon_ver}")
 

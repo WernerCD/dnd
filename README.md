@@ -21,4 +21,7 @@ python tools/check_sites.py
 
 To add a tool: add a card to `site/index.html` and a row to this table, then give the tool's header a "D&D Toolbox" link back to `https://wernercd.github.io/dnd/`.
 
-Unofficial fan content. Rules text in the tools comes from SRD 5.1 and 5.2 (CC BY 4.0) by Wizards of the Coast LLC.
+## Credits and license
+- Code: MIT, see [LICENSE](LICENSE).
+- Rules text in the tools comes from SRD 5.1 and 5.2 (CC BY 4.0) by Wizards of the Coast LLC.
+- Unofficial fan content. Not affiliated with or endorsed by Wizards of the Coast.

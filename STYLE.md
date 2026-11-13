@@ -1,4 +1,4 @@
-# D&D Toolbox: shared site conventions (v1.1)
+# D&D Toolbox: shared site conventions (v1.3)
 
 Every site in the toolbox follows this, so they look and behave like one site:
 
@@ -53,6 +53,15 @@ The same on every page of every site:
 - It reads the build id that CI stamped into its own `?v=` link. When the tab becomes visible again (at most every 2 minutes) and every 15 minutes, it re-fetches the page with the cache bypassed. If the live page links a different `version.js?v=` build, it shows a small "A new version of this page is available. Reload" bar.
 - No workflow change is needed: the existing `?v=dev` sed on the HTML pages covers it. It does nothing on a local copy (`?v=dev`).
 
+## 6b. Head tags, 404, license, README, print, CI (v1.3)
+- **Head tags (`shared/head.html`):** every `index.html` and `changes.html` carries the theme-color pair, a canonical link and the Open Graph and Twitter tags right after the description. Fill in the title, the description and the page's full live URL.
+- **404 page (`shared/404.html`):** every site has a `site/404.html` built from the template. It uses absolute `/REPO/...` asset links, because GitHub Pages serves it at any depth, and adds `noindex`. The workflow's `?v=dev` sed must cover it (`site/*.html` does).
+- **License (`shared/LICENSE`):** copy it unchanged to the repo root as `LICENSE`. It is MIT for the code, with the SRD content staying CC BY 4.0.
+- **README (`shared/README-template.md`):** every README uses these sections, in this order: Features, Data and copyright, Layout, Run locally, Credits and license. The hub's README is the one exception: it is a table of the tools.
+- **Print:** the shared block's `@media print` makes pages paper-friendly and hides the header bar, theme button, footer links and all buttons. Each site adds its own print rules to hide its filters and controls, and to print its main content (cards, stat block, build table or list).
+- **Tap targets:** header and footer links are at least 24px tall (shared CSS). Site-specific links and buttons in lists should meet the same minimum.
+- **CI check (`shared/check_site.py`):** copy it unchanged to `tools/check_site.py`. Each workflow runs it as a step after the data build (if any) and before `configure-pages`: `- name: Check site` / `run: python tools/check_site.py`. A site's own tests (for example the planner's `node tools/check.js`) also run in that step.
+
 ## 7. Checks before pushing
 - At 375 px and at desktop width, in light and dark, `index.html` and `changes.html` show no horizontal scroll and no console errors.
 - Every footer link resolves. The theme carries across sites.
@@ -63,5 +72,6 @@ The same on every page of every site:
 - Sites that are already live are pushed without asking again. Only a new public repo needs Chris's yes.
 
 ## Revisions
+- v1.3 (2026-11-13): 24px tap targets and a print layout in the shared CSS; head tags, 404 page, LICENSE, README layout and the CI smoke check (section 6b).
 - v1.2 (2026-11-13): added `shared/version.js`, the update notice (section 6a), loaded on every page of every site.
 - v1.1 (2026-11-13): `.changes` no longer narrows the whole `.wrap`, so the change log lines up with the header logo; its children are limited to 780px instead.
