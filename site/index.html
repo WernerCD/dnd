@@ -9,14 +9,20 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
-<script>try { var t = localStorage.getItem('dnd.theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}</script>
+<script>try{var t=localStorage.getItem('dnd.theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
+<link rel="stylesheet" href="styles.css?v=dev">
 </head>
 <body>
 <header class="site-header">
+  <div class="wrap hub-bar">
+    <a href="./" aria-current="page">D&amp;D Toolbox</a>
+    <nav class="hub-nav" aria-label="Site">
+      <a href="changes.html">Changes</a>
+    </nav>
+  </div>
   <div class="wrap header-inner">
     <div class="brand">
-      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2l11 7v14l-11 7-11-7V9z"/></svg>
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2l11 7v14l-11 7-11-7V9z"/></svg>
       <div>
         <h1>D&amp;D Toolbox</h1>
         <p class="tagline">Helper sites for D&amp;D 5e, 2014 and 2024 rules</p>
@@ -57,17 +63,20 @@
     </div>
   </section>
 
-  <footer class="about">
-    <p>Unofficial fan content, not affiliated with or endorsed by Wizards of the Coast. Rules text in these tools comes from the System Reference Documents 5.1 and 5.2 by Wizards of the Coast LLC, licensed under <a href="https://creativecommons.org/licenses/by/4.0/legalcode" rel="noopener">CC BY 4.0</a>. Source code is on <a href="https://github.com/WernerCD" rel="noopener">GitHub</a>.</p>
-  </footer>
 </main>
-<script>
-document.getElementById('themeBtn').addEventListener('click', function () {
-  var cur = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-  var next = cur === 'dark' ? 'light' : 'dark';
-  document.documentElement.dataset.theme = next;
-  try { localStorage.setItem('dnd.theme', next); } catch (e) {}
-});
-</script>
+<footer class="site-footer">
+  <div class="wrap">
+    <ul class="foot-links">
+      <li><a href="./" aria-current="page">D&amp;D Toolbox</a></li>
+      <li><a href="https://wernercd.github.io/dnd-druid-wildshapes/">Wild Shape Beast List</a></li>
+      <li><a href="https://wernercd.github.io/dnd-items/">Item Finder</a></li>
+      <li><a href="changes.html">Changes</a></li>
+      <li><a href="https://github.com/WernerCD/dnd" rel="noopener">Source code</a></li>
+      <li><a href="https://github.com/WernerCD/dnd/issues" rel="noopener">Report a problem</a></li>
+    </ul>
+    <p>Unofficial fan content, not affiliated with or endorsed by Wizards of the Coast. Rules text comes from the System Reference Documents 5.1 and 5.2 by Wizards of the Coast LLC, licensed under <a href="https://creativecommons.org/licenses/by/4.0/legalcode" rel="noopener">CC BY 4.0</a>.</p>
+  </div>
+</footer>
+<script src="theme.js?v=dev"></script>
 </body>
 </html>
