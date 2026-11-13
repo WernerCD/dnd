@@ -48,6 +48,11 @@ The same on every page of every site:
 - The colour tokens in `:root` (light, dark media query and `[data-theme]`) must be the same on every site. Copy them from `dnd-druid-wildshapes/site/styles.css`.
 - A site may add its own `--src-*` and similar tokens, but must not change the shared ones.
 
+## 6a. Update notice (`shared/version.js`)
+- Every page loads it last, right after the theme script: `<script src="theme.js?v=dev"></script>` then `<script src="version.js?v=dev"></script>`. Copy the file unchanged.
+- It reads the build id that CI stamped into its own `?v=` link. When the tab becomes visible again (at most every 2 minutes) and every 15 minutes, it re-fetches the page with the cache bypassed. If the live page links a different `version.js?v=` build, it shows a small "A new version of this page is available. Reload" bar.
+- No workflow change is needed: the existing `?v=dev` sed on the HTML pages covers it. It does nothing on a local copy (`?v=dev`).
+
 ## 7. Checks before pushing
 - At 375 px and at desktop width, in light and dark, `index.html` and `changes.html` show no horizontal scroll and no console errors.
 - Every footer link resolves. The theme carries across sites.
@@ -58,4 +63,5 @@ The same on every page of every site:
 - Sites that are already live are pushed without asking again. Only a new public repo needs Chris's yes.
 
 ## Revisions
+- v1.2 (2026-11-13): added `shared/version.js`, the update notice (section 6a), loaded on every page of every site.
 - v1.1 (2026-11-13): `.changes` no longer narrows the whole `.wrap`, so the change log lines up with the header logo; its children are limited to 780px instead.
