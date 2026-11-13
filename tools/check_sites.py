@@ -4,7 +4,7 @@ live pages up, and the shared header/footer/CSS/theme matching shared/.
 Run from anywhere:  python Y:/Dev/GitHub/dnd/tools/check_sites.py
 Exit code 0 = all OK, 1 = something to fix (printed as FAIL lines).
 """
-import json, re, subprocess, sys, urllib.request
+import json, re, subprocess, sys, urllib.error, urllib.request
 from pathlib import Path
 
 HUB = Path(__file__).resolve().parents[1]
@@ -25,8 +25,10 @@ def fetch(url):
     try:
         with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=20) as r:
             return r.status, r.read().decode("utf-8", "replace")
+    except urllib.error.HTTPError as e:
+        return e.code, e.read().decode("utf-8", "replace")
     except Exception as e:
-        return getattr(e, "code", 0) or 0, ""
+        return 0, ""
 
 def shared_block(css):
     m = re.search(r"/\* === dnd-shared v[\d.]+.*?/\* === end dnd-shared v[\d.]+ === \*/", css, re.S)
