@@ -1,4 +1,4 @@
-# D&D Toolbox: shared site conventions (v1)
+# D&D Toolbox: shared site conventions (v1.1)
 
 Every site in the toolbox follows this, so they look and behave like one site:
 
@@ -51,3 +51,6 @@ The same on every page of every site:
 ## 7. Checks before pushing
 - At 375 px and at desktop width, in light and dark, `index.html` and `changes.html` show no horizontal scroll and no console errors.
 - Every footer link resolves. The theme carries across sites.
+
+## Revisions
+- v1.1 (2026-11-13): `.changes` no longer narrows the whole `.wrap`, so the change log lines up with the header logo; its children are limited to 780px instead.
