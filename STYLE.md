@@ -1,4 +1,4 @@
-# D&D Toolbox: shared site conventions (v1.3)
+# D&D Toolbox: shared site conventions (v1.4)
 
 Every site in the toolbox follows this, so they look and behave like one site:
 
@@ -72,6 +72,7 @@ The same on every page of every site:
 - Sites that are already live are pushed without asking again. Only a new public repo needs Chris's yes.
 
 ## Revisions
+- v1.4 (2026-11-13): the print colours now also override the dark-mode media query (`:root:not([data-theme="light"])`), so a dark OS no longer prints dark pages.
 - v1.3 (2026-11-13): 24px tap targets and a print layout in the shared CSS; head tags, 404 page, LICENSE, README layout and the CI smoke check (section 6b).
 - v1.2 (2026-11-13): added `shared/version.js`, the update notice (section 6a), loaded on every page of every site.
 - v1.1 (2026-11-13): `.changes` no longer narrows the whole `.wrap`, so the change log lines up with the header logo; its children are limited to 780px instead.
