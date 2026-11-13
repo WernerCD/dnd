@@ -52,5 +52,10 @@ The same on every page of every site:
 - At 375 px and at desktop width, in light and dark, `index.html` and `changes.html` show no horizontal scroll and no console errors.
 - Every footer link resolves. The theme carries across sites.
 
+## 8. Sync routine
+- After any change to a site, or to `shared/`, run `python tools/check_sites.py` from the hub repo. It must end with `ALL OK`.
+- A change to `shared/` bumps the version in the CSS block's comments, gets a line under Revisions, and is copied to every site in the same pass.
+- Sites that are already live are pushed without asking again. Only a new public repo needs Chris's yes.
+
 ## Revisions
 - v1.1 (2026-11-13): `.changes` no longer narrows the whole `.wrap`, so the change log lines up with the header logo; its children are limited to 780px instead.
