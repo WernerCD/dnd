@@ -9,6 +9,7 @@ The home page for a set of free D&D 5e helper sites (2014 and 2024 rules).
 | Wild Shape Beast List | https://wernercd.github.io/dnd-druid-wildshapes/ | [dnd-druid-wildshapes](https://github.com/WernerCD/dnd-druid-wildshapes) |
 | Item Finder | https://wernercd.github.io/dnd-items/ | [dnd-items](https://github.com/WernerCD/dnd-items) |
 | Multiclass Planner | https://wernercd.github.io/dnd-multiclass-planner/ | [dnd-multiclass-planner](https://github.com/WernerCD/dnd-multiclass-planner) |
+| Spell Planner | https://wernercd.github.io/dnd-magic/ | [dnd-magic](https://github.com/WernerCD/dnd-magic) |
 
 Static HTML/CSS in `site/`, with no build step. Every push to `main` deploys through `.github/workflows/pages.yml`.
 
