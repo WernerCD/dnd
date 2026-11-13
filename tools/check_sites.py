@@ -61,6 +61,15 @@ for site in SITES:
     css = (repo / "site" / "styles.css").read_text(encoding="utf-8")
     blk = shared_block(css)
     (ok if blk == canon_css else bad)(site, f"styles.css shared block matches {canon_ver}" if blk == canon_css else f"styles.css shared block differs from {canon_ver} (found {blk and re.search(r'v[\d.]+', blk).group(0)})")
+    for js in ["theme.js", "version.js"]:
+        canon = (HUB / "shared" / js).read_text(encoding="utf-8").replace("\r\n", "\n")
+        f = repo / "site" / js
+        if not f.exists(): bad(site, f"site/{js} missing"); continue
+        mine = f.read_text(encoding="utf-8").replace("\r\n", "\n")
+        # theme.js differs only in its OLD_KEY line
+        strip = lambda t: re.sub(r"var OLD_KEY = [^;]*;", "", t)
+        same = strip(mine) == strip(canon)
+        (ok if same else bad)(site, f"site/{js} matches shared/{js}" if same else f"site/{js} differs from shared/{js}")
     toks = re.search(r":root\s*\{.*?\}", css, re.S)
     toks = toks.group(0) if toks else ""
     shared_toks = {k: v for k, v in re.findall(r"(--[\w-]+):\s*([^;]+);", toks) if not k.startswith("--src")}
@@ -77,6 +86,7 @@ for site in SITES:
         if 'class="site-footer"' not in html: probs.append("no shared footer")
         if "getItem('dnd.theme')" not in html: probs.append("no dnd.theme head script")
         if 'href="changes.html"' not in html: probs.append("no Changes link")
+        if 'src="version.js?v=' not in html: probs.append("no version.js update notice")
         missing = [l for l in foot_links if f'href="{l}"' not in html and not (l.rstrip("/").endswith("/" + site) and 'href="./"' in html)]
         if missing: probs.append("footer missing " + ", ".join(m.replace(BASE, "") for m in missing))
         if page == "" and site != "dnd" and 'href="https://wernercd.github.io/dnd/"' not in html: probs.append("no back-link to hub")
