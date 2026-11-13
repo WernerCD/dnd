@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D&amp;D Toolbox</title>
+<meta name="description" content="Free D&D 5e helper tools for 2014 and 2024 rules: druid Wild Shape beasts, an item finder and a multiclass planner.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2l11 7v14l-11 7-11-7V9z' fill='%23c9a227'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script>try { var t = localStorage.getItem('dnd.theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}</script>
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2l11 7v14l-11 7-11-7V9z"/></svg>
+      <div>
+        <h1>D&amp;D Toolbox</h1>
+        <p class="tagline">Helper sites for D&amp;D 5e, 2014 and 2024 rules</p>
+      </div>
+    </div>
+    <button id="themeBtn" class="icon-btn" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <h2>Pick a tool</h2>
+    <p>Quick, searchable references for building and playing characters. Each tool covers both the 2014 and 2024 rules and runs entirely in your browser.</p>
+  </section>
+
+  <section class="tools" aria-label="Tools">
+    <a class="tool" href="https://wernercd.github.io/dnd-druid-wildshapes/">
+      <span class="ico"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M20 4a12 12 0 1 0 8 20A10 10 0 0 1 20 4z"/></svg></span>
+      <h3>Wild Shape Beast List</h3>
+      <p>Every beast a druid can become, filtered by level for standard and Circle of the Moon druids.</p>
+      <ul><li>Full SRD stat blocks in both editions</li><li>Damage per round and feature filters</li><li>Star your known forms</li></ul>
+      <span class="go">Open Wild Shape &rarr;</span>
+    </a>
+    <a class="tool" href="https://wernercd.github.io/dnd-items/">
+      <span class="ico"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2l11 7v14l-11 7-11-7V9z"/></svg></span>
+      <h3>Item Finder</h3>
+      <p>Magic items and gear, searchable by type, rarity, attunement and source book.</p>
+      <ul><li>Full SRD 5.1 and 5.2 text</li><li>Index of items from later books</li><li>Filters saved in the link</li></ul>
+      <span class="go">Open Item Finder &rarr;</span>
+    </a>
+    <div class="tool soon">
+      <span class="ico"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3l3.5 8.5L28 13l-6.5 6 1.8 9L16 23.5 8.7 28l1.8-9L4 13l8.5-1.5z"/></svg></span>
+      <h3>Multiclass Planner</h3>
+      <p>Plan Paladin, Warlock and Sorcerer builds level by level: spell slots, Pact Magic, features and milestones.</p>
+      <span class="go">Coming soon</span>
+    </div>
+  </section>
+
+  <footer class="about">
+    <p>Unofficial fan content, not affiliated with or endorsed by Wizards of the Coast. Rules text in these tools comes from the System Reference Documents 5.1 and 5.2 by Wizards of the Coast LLC, licensed under <a href="https://creativecommons.org/licenses/by/4.0/legalcode" rel="noopener">CC BY 4.0</a>. Source code is on <a href="https://github.com/WernerCD" rel="noopener">GitHub</a>.</p>
+  </footer>
+</main>
+<script>
+document.getElementById('themeBtn').addEventListener('click', function () {
+  var cur = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  try { localStorage.setItem('dnd.theme', next); } catch (e) {}
+});
+</script>
+</body>
+</html>
