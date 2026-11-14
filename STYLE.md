@@ -62,6 +62,19 @@ The same on every page of every site:
 - **Tap targets:** header and footer links are at least 24px tall (shared CSS). Site-specific links and buttons in lists should meet the same minimum.
 - **CI check (`shared/check_site.py`):** copy it unchanged to `tools/check_site.py`. Each workflow runs it as a step after the data build (if any) and before `configure-pages`: `- name: Check site` / `run: python tools/check_site.py`. A site's own tests (for example the planner's `node tools/check.js`) also run in that step.
 
+## 6c. Shared characters (`shared/character.js`, v1.6)
+A character made on one site is available on every other site. All the sites are on `wernercd.github.io`, so they share `localStorage`; the shared list lives under the key `dnd.characters`. The full format and API are documented at the top of `shared/character.js`.
+- **Copy** `shared/character.js` unchanged to `site/character.js`, and load it on `index.html` **before** the site's own script: `<script src="character.js?v=dev"></script>`. `changes.html` and `404.html` don't load it.
+- **Header:** `index.html` puts `<span class="char-pick" id="charPick"></span>` in the hub bar, right after the "D&D Toolbox" back-link (`shared/header.html` v2). The script fills it with a "Character" switcher. It stays empty on changes and 404 pages.
+- **The shared record** holds name, edition, classes (class, level, subclass id and name) and the six ability scores. Each site keeps its own detail in its own keys and stores per-character extras only under `links['<its repo>']`, through `DndChar.setLink()`. It never edits another site's link.
+- **Who writes what:**
+  - The Multiclass Planner is the main editor of classes, levels, subclasses and scores.
+  - Other sites may create a simple single-class character, but they only change classes and levels when the user asks.
+  - Every site reads the active character and follows `DndChar.onChange()`.
+- **Hand-offs:** link to another tool with `DndChar.url('<repo>', id)` (`?char=<id>`). Arriving with `?char=` makes that character active.
+- **Subclass ids differ between sites.** Match them with `DndChar.sameSub()`, never with `===`.
+- **No character, or one without your class:** the site works exactly as before. A character only pre-fills; it never locks the user out of the site's own controls.
+
 ## 7. Checks before pushing
 - At 375 px and at desktop width, in light and dark, `index.html` and `changes.html` show no horizontal scroll and no console errors.
 - Every footer link resolves. The theme carries across sites.
@@ -72,6 +85,7 @@ The same on every page of every site:
 - Sites that are already live are pushed without asking again. Only a new public repo needs Chris's yes.
 
 ## Revisions
+- v1.6 (2026-11-13): shared characters. Adds `shared/character.js`, the `dnd.characters` store and the header's character switcher (section 6c).
 - v1.5 (2026-11-13): print also resets --accent, --accent-ink, --gold, --warn, --warn-bg and --chip to their light values.
 - v1.4 (2026-11-13): the print colours now also override the dark-mode media query (`:root:not([data-theme="light"])`), so a dark OS no longer prints dark pages.
 - v1.3 (2026-11-13): 24px tap targets and a print layout in the shared CSS; head tags, 404 page, LICENSE, README layout and the CI smoke check (section 6b).

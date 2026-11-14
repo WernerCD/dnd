@@ -25,6 +25,7 @@
 <header class="site-header">
   <div class="wrap hub-bar">
     <a href="./" aria-current="page">D&amp;D Toolbox</a>
+    <span class="char-pick" id="charPick"></span>
     <nav class="hub-nav" aria-label="Site">
       <a href="changes.html">Changes</a>
     </nav>
@@ -80,6 +81,30 @@
     </a>
   </section>
 
+  <section class="chars" id="characters" aria-labelledby="charsH">
+    <h2 id="charsH">Characters</h2>
+    <p class="intro">Your characters are shared by every tool. A Paladin built in the Multiclass Planner opens in the Spell Planner with its Paladin spell list, level and spellcasting modifier already set. A druid's level and circle carry over to Wild Shape. Characters are stored only in this browser. Use Export to back them up or move them to another device.</p>
+    <ul class="char-list" id="charList"></ul>
+    <form class="new-char" id="newChar">
+      <h3>Quick character</h3>
+      <div class="nc-row">
+        <label>Name <input id="ncName" maxlength="60" placeholder="Aric"></label>
+        <label>Rules <select id="ncEd"><option value="2024">2024</option><option value="2014">2014</option></select></label>
+        <label>Class <select id="ncClass"></select></label>
+        <label>Level <input id="ncLvl" type="number" min="1" max="20" value="1"></label>
+        <label>Subclass <input id="ncSub" maxlength="80" placeholder="optional"></label>
+        <button class="btn primary" type="submit">Add</button>
+      </div>
+      <p class="muted small">For multiclass builds, ability scores and level-by-level plans, use the <a href="https://wernercd.github.io/dnd-multiclass-planner/">Multiclass Planner</a>. Its saved builds appear here.</p>
+    </form>
+    <div class="char-io">
+      <button class="btn" type="button" id="charExport">Export characters</button>
+      <button class="btn" type="button" id="charImportBtn">Import</button>
+      <input type="file" id="charImport" accept="application/json,.json" hidden>
+      <span id="charMsg" class="muted small" role="status"></span>
+    </div>
+  </section>
+
 </main>
 <footer class="site-footer">
   <div class="wrap">
@@ -97,6 +122,8 @@
   </div>
 </footer>
 <script src="theme.js?v=dev"></script>
+<script src="character.js?v=dev"></script>
+<script src="hub.js?v=dev"></script>
 <script src="version.js?v=dev"></script>
 </body>
 </html>
