@@ -27,6 +27,7 @@
         (ch.classes.some(function (x) { return x.subName; }) ? '<br><span class="muted">' + ch.classes.filter(function (x) { return x.subName; }).map(function (x) { return esc(x.subName); }).join(', ') + '</span>' : '') + '</p>' +
         '<div class="char-tools">' + tools(ch) + '</div>' +
         '<div class="char-acts">' + (on ? '' : '<button type="button" class="link" data-act="' + esc(ch.id) + '">Make active</button>') +
+        '<button type="button" class="link" data-share="' + esc(ch.id) + '">Share link</button>' +
         '<button type="button" class="link danger" data-del="' + esc(ch.id) + '">Delete</button></div></li>';
     }).join('') : '<li class="empty">No characters yet. Make one below, or save a build in the Multiclass Planner.</li>';
   }
@@ -34,6 +35,7 @@
   $('charList').addEventListener('click', function (e) {
     var t = e.target.closest('button'); if (!t) return;
     if (t.dataset.act) C.setActive(t.dataset.act);
+    if (t.dataset.share) { var sc = C.get(t.dataset.share); if (sc) C.copyShare(sc, 'dnd', t); }
     if (t.dataset.del) {
       var ch = C.get(t.dataset.del);
       if (ch && confirm('Delete "' + ch.name + '" from every D&D Toolbox site in this browser? Each site\'s own lists stay, but lose the link to this character.')) C.remove(ch.id);

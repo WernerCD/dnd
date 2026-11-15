@@ -62,7 +62,7 @@ The same on every page of every site:
 - **Tap targets:** header and footer links are at least 24px tall (shared CSS). Site-specific links and buttons in lists should meet the same minimum.
 - **CI check (`shared/check_site.py`):** copy it unchanged to `tools/check_site.py`. Each workflow runs it as a step after the data build (if any) and before `configure-pages`: `- name: Check site` / `run: python tools/check_site.py`. A site's own tests (for example the planner's `node tools/check.js`) also run in that step.
 
-## 6c. Shared characters (`shared/character.js`, v1.6)
+## 6c. Shared characters (`shared/character.js`, v1.7)
 A character made on one site is available on every other site. All the sites are on `wernercd.github.io`, so they share `localStorage`; the shared list lives under the key `dnd.characters`. The full format and API are documented at the top of `shared/character.js`.
 - **Copy** `shared/character.js` unchanged to `site/character.js`, and load it on `index.html` **before** the site's own script: `<script src="character.js?v=dev"></script>`. `changes.html` and `404.html` don't load it.
 - **Header:** `index.html` puts `<span class="char-pick" id="charPick"></span>` in the hub bar, right after the "D&D Toolbox" back-link (`shared/header.html` v2). The script fills it with a "Character" switcher. It stays empty on changes and 404 pages.
@@ -72,6 +72,7 @@ A character made on one site is available on every other site. All the sites are
   - Other sites may create a simple single-class character, but they only change classes and levels when the user asks.
   - Every site reads the active character and follows `DndChar.onChange()`.
 - **Hand-offs:** link to another tool with `DndChar.url('<repo>', id)` (`?char=<id>`). Arriving with `?char=` makes that character active.
+- **Share links (v1.7):** the header's Share button (and the hub's "Share link") copies `DndChar.shareUrl(ch, repo)`, a link whose `#dndchar=` fragment carries the shared record (name, edition, classes, scores; not `links`). Opening it in another browser shows a prompt to add the character, or to update it if that browser already has a different copy. **A site can add its own detail to the link:** call `DndChar.setShare(id, '<repo>', data)` whenever that detail changes (the Spell Planner puts the character's list, the Multiclass Planner its build; keep it under 6000 characters). When a share link is accepted, that data lands in the character's `inbox`; on load and in `onChange`, call `DndChar.takeInbox(activeId, '<repo>')` and, if it returns data, rebuild your own state from it (a new list or build, never overwriting an existing one without asking). character.js removes `#dndchar=` from the address before the site's own script runs, so a site's own `#` state (for example `#list=`) is untouched. Sites don't need to do anything.
 - **Subclass ids differ between sites.** Match them with `DndChar.sameSub()`, never with `===`.
 - **No character, or one without your class:** the site works exactly as before. A character only pre-fills; it never locks the user out of the site's own controls.
 - **Syncing rules (v1.6.1, from the 2026-11-14 audit):**
@@ -95,6 +96,7 @@ A character made on one site is available on every other site. All the sites are
 - Sites that are already live are pushed without asking again. Only a new public repo needs Chris's yes.
 
 ## Revisions
+- v1.7 (2026-11-15): character share links (`character.js` v1.2: `shareUrl`, `copyShare`, `setShare`, `takeInbox`, the `#dndchar=` import prompt, and a Share button in the header switcher); CSS for `.char-share` and `.char-import`.
 - v1.6.2 (2026-11-14): light `--muted` is #5c665f (was #6f7a72, 3.7-4.4:1; now 5.0:1 or better on every light surface).
 - v1.6.1 (2026-11-14): `character.js` v1.1 (deleting the active character leaves none active) and the syncing and drop-down rules in section 6c.
 - v1.6 (2026-11-13): shared characters. Adds `shared/character.js`, the `dnd.characters` store and the header's character switcher (section 6c).
