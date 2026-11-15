@@ -95,6 +95,7 @@ A character made on one site is available on every other site. All the sites are
 - Sites that are already live are pushed without asking again. Only a new public repo needs Chris's yes.
 
 ## Revisions
+- v1.6.2 (2026-11-14): light `--muted` is #5c665f (was #6f7a72, 3.7-4.4:1; now 5.0:1 or better on every light surface).
 - v1.6.1 (2026-11-14): `character.js` v1.1 (deleting the active character leaves none active) and the syncing and drop-down rules in section 6c.
 - v1.6 (2026-11-13): shared characters. Adds `shared/character.js`, the `dnd.characters` store and the header's character switcher (section 6c).
 - v1.5 (2026-11-13): print also resets --accent, --accent-ink, --gold, --warn, --warn-bg and --chip to their light values.
