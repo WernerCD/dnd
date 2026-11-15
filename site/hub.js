@@ -4,6 +4,7 @@
   if (!C) return;
   var CLASSES = ['artificer', 'barbarian', 'bard', 'cleric', 'druid', 'fighter', 'monk', 'paladin', 'ranger', 'rogue', 'sorcerer', 'warlock', 'wizard'];
   var CASTERS = ['artificer', 'bard', 'cleric', 'druid', 'paladin', 'ranger', 'sorcerer', 'warlock', 'wizard'];
+  var THIRD = /eldritch[\s-]*knight|arcane[\s-]*trickster/i;   // fighter and rogue subclasses that cast
   var cap = function (s) { return s.charAt(0).toUpperCase() + s.slice(1); };
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
 
@@ -11,7 +12,7 @@
 
   function tools(ch) {
     var t = [['dnd-multiclass-planner', 'Plan levels']];
-    if (ch.classes.some(function (x) { return CASTERS.indexOf(x.cls) >= 0; })) t.push(['dnd-magic', 'Spells']);
+    if (ch.classes.some(function (x) { return CASTERS.indexOf(x.cls) >= 0 || THIRD.test(x.subName || x.sub || ''); })) t.push(['dnd-magic', 'Spells']);
     if (C.levelIn(ch, 'druid')) t.push(['dnd-druid-wildshapes', 'Wild Shape']);
     t.push(['dnd-items', 'Items']);
     return t.map(function (x) { return '<a class="btn" href="' + C.url(x[0], ch.id) + '">' + x[1] + '</a>'; }).join('');

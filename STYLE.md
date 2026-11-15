@@ -74,6 +74,16 @@ A character made on one site is available on every other site. All the sites are
 - **Hand-offs:** link to another tool with `DndChar.url('<repo>', id)` (`?char=<id>`). Arriving with `?char=` makes that character active.
 - **Subclass ids differ between sites.** Match them with `DndChar.sameSub()`, never with `===`.
 - **No character, or one without your class:** the site works exactly as before. A character only pre-fills; it never locks the user out of the site's own controls.
+- **Syncing rules (v1.6.1, from the 2026-11-14 audit):**
+  - **React to the fields you use, not to `updated`.** Another site re-saving the character (or setting its own link) changes `updated` and fires `onChange`. Compare the fields your site reads (for example class levels and subclass) with what you last applied, and do nothing if they are the same.
+  - **Never drop what you don't recognise.** A class or subclass your site doesn't list stays in the shared record untouched when you save. Show it as read-only or "other", never erase it.
+  - **Don't overwrite the user's unsaved work.** If the user has changed something on your site since the character was last applied, ask (or show a "Character changed: apply / keep mine" notice) instead of replacing it.
+  - **A control the user set by hand wins** over the character until they choose to follow the character again. A "Follow character" toggle is the recommended way to show this.
+  - **Debounce shared saves.** Write the shared record after a pause (about 500 ms) or on blur, never on every keystroke.
+  - **Two tabs:** your own keys (lists, profiles, favourites) can change in another tab. Listen for the `storage` event on them, or re-read before you write, so one tab never overwrites the other's work.
+  - **Deleted characters:** if a character you linked to no longer exists, keep your own data (lists, profiles) and just drop the link quietly. Deleting the active character leaves no character active (character.js v1.1).
+  - **Unknown `?char=` id:** say so briefly ("That character isn't in this browser") rather than ignoring it.
+- **Accessibility for drop-downs and pickers:** Escape closes them and returns focus to the button that opened them, they stay inside the screen at 375 px, and re-rendering a list after a filter change keeps focus on the control the user used.
 
 ## 7. Checks before pushing
 - At 375 px and at desktop width, in light and dark, `index.html` and `changes.html` show no horizontal scroll and no console errors.
@@ -85,6 +95,7 @@ A character made on one site is available on every other site. All the sites are
 - Sites that are already live are pushed without asking again. Only a new public repo needs Chris's yes.
 
 ## Revisions
+- v1.6.1 (2026-11-14): `character.js` v1.1 (deleting the active character leaves none active) and the syncing and drop-down rules in section 6c.
 - v1.6 (2026-11-13): shared characters. Adds `shared/character.js`, the `dnd.characters` store and the header's character switcher (section 6c).
 - v1.5 (2026-11-13): print also resets --accent, --accent-ink, --gold, --warn, --warn-bg and --chip to their light values.
 - v1.4 (2026-11-13): the print colours now also override the dark-mode media query (`:root:not([data-theme="light"])`), so a dark OS no longer prints dark pages.
