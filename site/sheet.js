@@ -66,8 +66,10 @@
       mod: function (a) { return Math.floor((ab[ABIL.indexOf(a)] - 10) / 2); },
       saves: arr(P && P.saves).map(function (s) { return String(s).toLowerCase().slice(0, 3); }),
       hp: N ? int(N.hp, 1, 999) : ahead ? null : int(P && P.hp, 1, 999), planHp: int(P && P.hp, 1, 999),
-      hd: N ? (N.hd ? parseHD(N.hd) : single ? hdFromClasses(ch, lvl) : []) : ahead || !(P && P.hd) ? hdFromClasses(ch) : parseHD(P.hd),
-      hdUnknown: !!(N && !N.hd && !single),
+      hd: N ? (N.hd ? parseHD(N.hd) : Array.isArray(N.classes) && N.classes.length ? hdFromClasses({ classes: N.classes.filter(function (x) { return x && x.cls; }).map(function (x) { return { cls: str(x.cls, 30).toLowerCase(), lvl: int(x.lvl, 1, 20) || 1 }; }) }) : single ? hdFromClasses(ch, lvl) : []) : ahead || !(P && P.hd) ? hdFromClasses(ch) : parseHD(P.hd),
+      hdUnknown: !!(N && !N.hd && !single && !(Array.isArray(N.classes) && N.classes.length)),
+      // now.classes: the class levels at the current level, in the order they were first taken
+      nowCls: N && Array.isArray(N.classes) ? N.classes.filter(function (x) { return x && x.cls; }).map(function (x) { return { cls: str(x.cls, 30).toLowerCase(), lvl: int(x.lvl, 1, 20) || 1 }; }) : null,
       slots: slotsOf(N ? N.slots : P && P.slots),
       pact: pactOf(N ? N.pact : P && P.pact),
       dc: arr(P && P.dc).filter(function (d) { return d && typeof d === 'object'; }).slice(0, 6),
@@ -87,6 +89,7 @@
   }
   function slotsOf(a) { return Array.isArray(a) ? a.slice(0, 9).map(function (n) { return int(n, 0, 9) || 0; }) : []; }
   function pactOf(o) { return o && typeof o === 'object' ? { n: int(o.n, 0, 9) || 0, lvl: int(o.lvl, 1, 9) || 1 } : null; }
+  function clsLvl(list, c) { for (var i = 0; i < list.length; i++) if (list[i].cls === c) return list[i].lvl; return 0; }
   function hdFromClasses(ch, only) {   // hit dice from the shared record's classes; `only` = level of a single-class character
     var by = {}; ch.classes.forEach(function (x) { var d = HD[x.cls] || 8; by[d] = (by[d] || 0) + (only || x.lvl); });
     return Object.keys(by).map(Number).sort(function (a, b) { return b - a; }).map(function (d) { return { n: Math.min(20, by[d]), d: d }; });
@@ -169,12 +172,12 @@
     ].filter(Boolean);
     var srcTxt = m.N ? (m.N.src === 'import' ? ' (from the imported character)' : m.N.src === 'at' ? ' (the planner\'s "At level" setting)' : '') : '';
     var lvlNote = m.N && m.ahead ? '<p class="sh-note">The Multiclass Planner build goes to level ' + m.planLvl + '; this sheet shows level ' + m.lvl + srcTxt + '.' +
-        (m.single ? '' : ' Features and feats are filtered by total level only' + (m.hdUnknown ? ', and hit dice per class aren\'t known yet' : '') + '.') + '</p>'
+        (m.single || m.nowCls ? '' : ' Features and feats are filtered by total level only' + (m.hdUnknown ? ', and hit dice per class aren\'t known yet' : '') + '.') + '</p>'
       : m.ahead ? '<p class="sh-note warn">The Multiclass Planner build goes to level ' + m.planLvl + '; the character is level ' + m.lvl + ' now. Level, proficiency, hit dice, features and feats here follow level ' + m.lvl + '. Slots and resources are from the level ' + m.planLvl + ' plan, and max HP needs setting by hand.</p>'
       : m.planLvl && m.planLvl < m.lvl ? '<p class="sh-note">The Multiclass Planner build stops at level ' + m.planLvl + '; the character is level ' + m.lvl + '.</p>' : '';
     return '<section class="sh-top" aria-labelledby="shName">' +
       '<div class="sh-id"><h2 id="shName">' + esc(ch.name) + '</h2>' +
-      '<p class="sh-cls">' + (esc(C.summary(ch)) || 'No classes yet') + (subs ? ' &middot; ' + subs : '') + ' &middot; ' + ch.ed + ' rules' + (origin ? '<br>' + origin : '') + '</p></div>' +
+      '<p class="sh-cls">' + (m.nowCls && m.nowCls.length ? esc(C.summary({ classes: m.nowCls })) + ' <span class="muted">(plan: ' + esc(C.summary(ch)) + ')</span>' : esc(C.summary(ch)) || 'No classes yet') + (subs ? ' &middot; ' + subs : '') + ' &middot; ' + ch.ed + ' rules' + (origin ? '<br>' + origin : '') + '</p></div>' +
       '<dl class="sh-stats">' + stats.map(function (s) { return '<div' + (s[2] ? ' title="' + esc(s[2]) + '"' : '') + '><dt>' + s[0] + '</dt><dd>' + s[1] + '</dd></div>'; }).join('') + '</dl>' +
       lvlNote + '</section>';
   }
@@ -325,7 +328,8 @@
       var by = {}, order = [];
       var later = 0;
       arr(P.features).forEach(function (f) {
-        if (!f || !f.name) return; var c = str(f.cls, 30).toLowerCase() || 'other', have = m.N ? m.lvl : C.levelIn(m.ch, c);   // with now{}: class levels unknown for multiclass, so total level is the cap
+        if (!f || !f.name) return; var c = str(f.cls, 30).toLowerCase() || 'other', have = m.nowCls ? clsLvl(m.nowCls, c) : m.N ? m.lvl : C.levelIn(m.ch, c);   // now.classes gives class levels; else total level caps
+        if (m.nowCls && !have && m.nowCls.length && C.levelIn(m.ch, c)) { later++; return; }   // a class the plan takes later
         if (have && int(f.lvl, 1, 20) > have) { later++; return; }   // planned for a later level of that class
         if (!by[c]) { by[c] = []; order.push(c); } by[c].push(f);
       });

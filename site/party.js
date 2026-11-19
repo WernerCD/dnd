@@ -24,6 +24,7 @@
   var XP = [0, 300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 64000, 85000, 100000, 120000, 140000, 165000, 195000, 225000, 265000, 305000, 355000];
   // the planner summary is for the full planned build; the shared record says where the character is now
   function nowOf(ch) { var P = sum(ch, REPOS.planner); return P && P.now && typeof P.now === 'object' && int(P.now.lvl, 1, 20) ? P.now : null; }   // planner at the current level
+  function nowCls(ch) { var N = nowOf(ch), l = N && Array.isArray(N.classes) ? N.classes.filter(function (x) { return x && x.cls; }).map(function (x) { return { cls: str(x.cls, 30).toLowerCase(), lvl: int(x.lvl, 1, 20) || 1 }; }) : []; return l.length ? l : null; }
   function levelOf(ch) { var P = sum(ch, REPOS.planner), N = nowOf(ch); return (N && int(N.lvl, 1, 20)) || C.level(ch) || int(P && P.lvl, 1, 20) || 1; }
   function maxHp(ch) {
     var P = sum(ch, REPOS.planner), N = nowOf(ch), p = play(ch.id) || {}, pl = int(P && P.lvl, 1, 20), ahead = !N && pl && C.level(ch) && pl > C.level(ch);
@@ -131,7 +132,7 @@
     var sheetUrl = 'sheet.html?char=' + encodeURIComponent(ch.id);
     return '<li class="pt-card" data-spot>' +
       '<h3><a href="' + sheetUrl + '">' + esc(ch.name) + '</a></h3>' +
-      '<p class="pt-sum">' + (esc(C.summary(ch)) || 'No classes yet') + (ch.classes.some(function (x) { return x.subName; }) ? '<br><span class="muted">' + ch.classes.filter(function (x) { return x.subName; }).map(function (x) { return esc(x.subName); }).join(', ') + '</span>' : '') + '</p>' +
+      '<p class="pt-sum">' + (nowCls(ch) ? esc(C.summary({ classes: nowCls(ch) })) + ' <span class="muted">(plan: ' + esc(C.summary(ch)) + ')</span>' : esc(C.summary(ch)) || 'No classes yet') + (ch.classes.some(function (x) { return x.subName; }) ? '<br><span class="muted">' + ch.classes.filter(function (x) { return x.subName; }).map(function (x) { return esc(x.subName); }).join(', ') + '</span>' : '') + '</p>' +
       (pct != null ? '<div class="pt-hpbar' + (pct <= 25 ? ' low' : '') + '" aria-hidden="true"><i style="width:' + Math.max(0, Math.min(100, pct)) + '%"></i></div>' : '') +
       '<dl class="pt-stats">' + stats.map(function (s) { return '<div' + (s[2] ? ' title="' + esc(s[2]) + '"' : '') + '><dt>' + s[0] + '</dt><dd>' + s[1] + '</dd></div>'; }).join('') + '</dl>' +
       (flags.length ? '<div class="pt-flags">' + flags.map(function (f) { return '<span>' + esc(f) + '</span>'; }).join('') + '</div>' : '') +
