@@ -120,7 +120,7 @@ for site in SITES:
 # hub lists every site
 _, hub = fetch(BASE + "dnd/")
 for site in SITES[1:]:
-    if f'class="tool" href="{BASE}{site}/"' not in hub: bad("dnd", f"hub has no live card for {site}")
+    if not re.search(r'<a class="tool"[^>]*href="' + re.escape(f"{BASE}{site}/") + '"', hub): bad("dnd", f"hub has no live card for {site}")
 
 print("\n" + ("ALL OK" if not fails else f"{len(fails)} problem(s):\n- " + "\n- ".join(fails)))
 sys.exit(1 if fails else 0)
