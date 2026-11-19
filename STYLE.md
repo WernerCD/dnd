@@ -133,6 +133,7 @@ A tool that can use it (spells, feats, items, the planner) checks `ch.imp` on lo
 - Sites that are already live are pushed without asking again. Only a new public repo needs Chris's yes.
 
 ## Revisions
+- v1.11.1 (2026-11-19): CSS v1.9.1: under 720 px the top bar wraps to "Toolbox · Tools · Changes" with the character picker on its own row, and the Tools menu stays inside the screen.
 - v1.11 (2026-11-19): `shared/nav.js` and CSS v1.9: centred drop-down menus of every page in the top bar.
 - v1.10 (2026-11-19): `shared/sources.js` and the source picker rule (6f: core books first and on by default, partner books listed but off); `character.js` v1.6 keeps `imp`, the imported-character summary (6g).
 - v1.9.1 (2026-11-18): `character.js` v1.5: opening a share link for a character you already have (same classes and scores) now takes its newer sheet summaries instead of ignoring them.
