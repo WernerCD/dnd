@@ -155,6 +155,7 @@ Each tool site publishes `site/search.json` for the hub's "Search every tool" bo
 - Sites that are already live are pushed without asking again. Only a new public repo needs Chris's yes.
 
 ## Revisions
+- v1.14.4 (2026-11-19): `links.js` v1.0.3: Title Case names in bold run-in headings (ending in `.` or `:`) never link. 2014 text with no `u14` still opens the tool's main entry; mark rare 2014-only meanings (e.g. the 2014 Divine Smite feature) `data-nolink`.
 - v1.14.3 (2026-11-19): 6j: an item may add `u14`, the link to its 2014 entry when `u` opens the 2024 one; `links.js` v1.0.2 uses it for 2014 text (nearest `data-ed`, else `?ed=`), `statblock.js` v1.1.1 sets `data-ed`, `dice.js` v1.0.2 re-scans on a timer (works in hidden tabs).
 - v1.14.2 (2026-11-19): `links.js` v1.0.1: multi-word Title Case spell and magic item names link without italics (2024 SRD style), italics ending in `.` or `:` (run-in headings such as "Slow.") never link, and `data-nolink` works on the element itself.
 - v1.14.1 (2026-11-19): `dice.js` v1.0.1: rolls inside an open modal `<dialog>` show the tray in that dialog (top layer); `data-roll` must contain a die, so a site's own `data-roll="0"` is left alone (better still, use another attribute name).
