@@ -64,7 +64,7 @@ for site in SITES:
     blk = shared_block(css)
     (ok if blk == canon_css else bad)(site, f"styles.css shared block matches {canon_ver}" if blk == canon_css else f"styles.css shared block differs from {canon_ver} (found {blk and re.search(r'v[\d.]+', blk).group(0)})")
     STATBLOCK_SITES = ("dnd-monsters", "dnd-druid-wildshapes")
-    for js in ["theme.js", "version.js", "character.js", "motion.js", "ui.js", "nav.js", "sw.js", "offline.js"] + (["statblock.js"] if site in STATBLOCK_SITES else []) + [j for j in ("chart.js", "sources.js", "statblock.js") if (repo / "site" / j).exists() and not (j == "statblock.js" and site in STATBLOCK_SITES)]:
+    for js in ["theme.js", "version.js", "character.js", "motion.js", "ui.js", "nav.js", "sw.js", "offline.js", "dice.js", "links.js"] + (["statblock.js"] if site in STATBLOCK_SITES else []) + [j for j in ("chart.js", "sources.js", "statblock.js") if (repo / "site" / j).exists() and not (j == "statblock.js" and site in STATBLOCK_SITES)]:
         canon = (HUB / "shared" / js).read_text(encoding="utf-8").replace("\r\n", "\n")
         f = repo / "site" / js
         if not f.exists(): bad(site, f"site/{js} missing"); continue
@@ -124,6 +124,7 @@ for site in SITES:
         if page == "" and ('src="motion.js?v=' not in html or 'src="ui.js?v=' not in html): probs.append("no motion.js/ui.js (STYLE 6d)")
         if 'nav.js?v=' not in html: probs.append("no nav.js tool menu (STYLE 3)")
         if 'offline.js?v=' not in html: probs.append("no offline.js (STYLE 6h)")
+        if page == "" and ('dice.js?v=' not in html or 'links.js?v=' not in html): probs.append("no dice.js/links.js (STYLE 6k)")
         if 'rel="manifest"' not in html or 'property="og:image"' not in html: probs.append("no manifest/og:image head tags (head v1.4)")
         if page == "" and site != "dnd" and 'href="https://wernercd.github.io/dnd/"' not in html: probs.append("no back-link to hub")
         v = re.search(r'styles\.css\?v=([0-9a-z]+)', html)

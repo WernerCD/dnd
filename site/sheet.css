@@ -229,3 +229,6 @@ h5.sp-cls { column-span: all; font-family: Fraunces, Georgia, serif; font-size: 
   .feat-list li { background: none; padding: 0 6px; }
   .pt-card { box-shadow: none; break-inside: avoid; }
 }
+/* dice roller entry (dice.js, STYLE 6k) */
+.sh-dice { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 4px 0 10px; }
+@media print { .sh-dice { display: none; } }

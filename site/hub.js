@@ -42,3 +42,6 @@
   C.onChange(render);
   render();
 })();
+
+/* Dice roller button (dice.js, STYLE 6k) */
+(function () { var b = document.getElementById('openDice'); if (b) b.addEventListener('click', function () { if (window.DndDice) DndDice.open(); }); })();

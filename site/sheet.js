@@ -160,6 +160,7 @@
   function edNote(m, s, t) { return s && (s.ed === '2014' || s.ed === '2024') && s.ed !== m.ed ? '<p class="sh-note">The ' + esc(TOOL[t].name) + ' planned this for ' + s.ed + ' rules; the character uses ' + m.ed + '.</p>' : ''; }
 
   // ---------- sections ----------
+  function rl(n, label, text) { return '<span data-roll="1d20' + (n < 0 ? '-' + Math.abs(n) : n ? '+' + n : '') + '" data-roll-label="' + esc(label) + '">' + (text == null ? sign(n) : text) + '</span>'; }   // dice.js (STYLE 6k)
   function topBlock(m, p) {
     var ch = m.ch, F = m.F;
     var subs = ch.classes.filter(function (x) { return x.subName; }).map(function (x) { return esc(x.subName); }).join(', ');
@@ -168,7 +169,7 @@
     var stats = [
       ['Level', m.lvl], ['Proficiency', sign(m.pb)],
       m.ac != null ? ['AC', m.ac] : null,
-      ['Initiative', sign(m.init != null ? m.init : m.mod('dex'))],
+      ['Initiative', rl(m.init != null ? m.init : m.mod('dex'), 'Initiative')],
       m.speed != null ? ['Speed', esc(str(m.speed, 20))] : null,
       pv && num(pv.prc) != null ? ['Passive Perception', num(pv.prc)] : m.skills ? ['Passive Perception', passiveFrom(m, 'percep', 'wis')] : ['Passive Wisdom', wisP, 'Passive Perception before any proficiency: 10 + Wisdom modifier'],
       pv && num(pv.ins) != null ? ['Passive Insight', num(pv.ins)] : m.skills ? ['Passive Insight', passiveFrom(m, 'insight', 'wis')] : null,
@@ -183,6 +184,7 @@
     return '<section class="sh-top" aria-labelledby="shName">' +
       '<div class="sh-id"><h2 id="shName">' + esc(ch.name) + '</h2>' +
       '<p class="sh-cls">' + (m.nowCls && m.nowCls.length ? esc(C.summary({ classes: m.nowCls })) + ' <span class="muted">(plan: ' + esc(C.summary(ch)) + ')</span>' : esc(C.summary(ch)) || 'No classes yet') + (subs ? ' &middot; ' + subs : '') + ' &middot; ' + ch.ed + ' rules' + (origin ? '<br>' + origin : '') + '</p></div>' +
+      '<p class="sh-dice"><button type="button" class="btn" data-a="dice">Dice roller</button> <span class="muted small">Tap an underlined number to roll it.</span></p>' +
       '<dl class="sh-stats">' + stats.map(function (s) { return '<div' + (s[2] ? ' title="' + esc(s[2]) + '"' : '') + '><dt>' + s[0] + '</dt><dd>' + s[1] + '</dd></div>'; }).join('') + '</dl>' +
       lvlNote + '</section>';
   }
@@ -203,10 +205,10 @@
     if (m.hd.length) {
       var con = m.mod('con');
       h += '<div class="sh-row"><span class="sh-lbl">Hit dice <span class="muted">(' + sign(con) + ' Con each)</span></span><span class="sh-pipset">' +
-        m.hd.map(function (x) { var used = Math.min(p.hd['d' + x.d] || 0, x.n); return '<span class="pipgrp"><b>d' + x.d + '</b> ' + pips('hd:' + x.d, x.n, x.n - used, 'd' + x.d + ' hit dice') + '</span>'; }).join('') + '</span></div>';
+        m.hd.map(function (x) { var used = Math.min(p.hd['d' + x.d] || 0, x.n); return '<span class="pipgrp"><b data-roll="1d' + x.d + (con < 0 ? '-' + Math.abs(con) : con ? '+' + con : '') + '" data-roll-label="Hit die">d' + x.d + '</b> ' + pips('hd:' + x.d, x.n, x.n - used, 'd' + x.d + ' hit dice') + '</span>'; }).join('') + '</span></div>';
     }
     var down = cur === 0;
-    h += '<div class="sh-row ds' + (down ? ' down' : '') + '"><span class="sh-lbl">Death saves ' + rule('death-saves', 'Death saving throw') + (down ? ' <b class="warn">at 0 HP</b>' : '') + '</span><span class="sh-pipset">' +
+    h += '<div class="sh-row ds' + (down ? ' down' : '') + '"><span class="sh-lbl">Death saves ' + rule('death-saves', 'Death saving throw') + ' <span data-roll="1d20" data-roll-label="Death save">roll</span>' + (down ? ' <b class="warn">at 0 HP</b>' : '') + '</span><span class="sh-pipset">' +
       '<span class="pipgrp">Successes ' + pips('ds:0', 3, p.ds[0], 'Death save successes') + '</span>' +
       '<span class="pipgrp fail">Failures ' + pips('ds:1', 3, p.ds[1], 'Death save failures') + '</span></span></div>' +
       (p.ds[1] >= 3 ? '<p class="sh-note warn">Three failures: the character dies.</p>' : p.ds[0] >= 3 ? '<p class="sh-note">Three successes: stable at 0 HP.</p>' : '');
@@ -234,8 +236,8 @@
   function abilities(m) {
     var h = '<div class="abil">' + ABIL.map(function (a, i) {
       var mod = m.mod(a), prof = m.saves.indexOf(a) >= 0;
-      return '<div class="ab"><span class="ab-n" title="' + ABN[a] + '">' + a.toUpperCase() + '</span><b class="ab-m">' + sign(mod) + '</b><span class="ab-s">' + m.ab[i] + '</span>' +
-        '<span class="ab-sv' + (prof ? ' prof' : '') + '" title="' + ABN[a] + ' saving throw' + (prof ? ' (proficient)' : '') + '">Save ' + sign(mod + (prof ? m.pb : 0)) + (prof ? ' &#9679;' : '') + '</span></div>';
+      return '<div class="ab"><span class="ab-n" title="' + ABN[a] + '">' + a.toUpperCase() + '</span><b class="ab-m">' + rl(mod, ABN[a] + ' check') + '</b><span class="ab-s">' + m.ab[i] + '</span>' +
+        '<span class="ab-sv' + (prof ? ' prof' : '') + '" title="' + ABN[a] + ' saving throw' + (prof ? ' (proficient)' : '') + '">Save ' + rl(mod + (prof ? m.pb : 0), ABN[a] + ' save') + (prof ? ' &#9679;' : '') + '</span></div>';
     }).join('') + '</div>';
     var note = m.abFromPlanner ? '<p class="sh-note">Ability scores as entered in the planner (it doesn\'t add increases from feats or ASIs).</p>' : '<p class="sh-note">' + (m.P ? 'Scores from the shared character; the planner did not send final scores.' : 'Scores from the shared character, before any planned increases.') + (m.saves.length ? '' : ' Saving throw proficiencies come from the Multiclass Planner.') + '</p>';
     return card('ab', 'Abilities and saves', m.P ? src(m, 'planner') : '', h + note + (m.pbGuess ? '<p class="sh-note">Proficiency bonus worked out from the current total level.</p>' : ''));
@@ -246,7 +248,7 @@
     if (m.dc.length) h += '<dl class="sh-dc">' + m.dc.map(function (d) {
       var ab = String(d.abil || '').toLowerCase().slice(0, 3);
       var redo = m.dcAhead && ABN[ab];   // plan ahead of the character: 8 + current proficiency + modifier
-      return '<div><dt>' + esc(ABN[ab] || cap(str(d.abil, 20)) || 'Spells') + '</dt><dd>DC <b>' + (redo ? 8 + m.pb + m.mod(ab) : int(d.dc, 1, 40) || '?') + '</b> &middot; attack <b>' + (redo ? sign(m.pb + m.mod(ab)) : num(d.atk) != null ? sign(int(d.atk, -10, 30)) : '?') + '</b></dd></div>';
+      return '<div><dt>' + esc(ABN[ab] || cap(str(d.abil, 20)) || 'Spells') + '</dt><dd>DC <b>' + (redo ? 8 + m.pb + m.mod(ab) : int(d.dc, 1, 40) || '?') + '</b> &middot; attack <b>' + (redo ? rl(m.pb + m.mod(ab), 'Spell attack') : num(d.atk) != null ? rl(int(d.atk, -10, 30), 'Spell attack') : '?') + '</b></dd></div>';
     }).join('') + '</dl>';
     var any = false, rows = '';
     m.slots.forEach(function (n, i) { if (!n) return; any = true; var used = Math.min(p.slots[i], n); rows += '<div class="slot"><span class="slot-l">' + ORD[i + 1].replace(' level', '') + '</span>' + pips('slot:' + i, n, n - used, ORD[i + 1] + ' slots') + '<span class="slot-c">' + (n - used) + '/' + n + '</span></div>'; });
@@ -263,14 +265,14 @@
       var multi = groups.length > 1;
       var item = function (x) {
         var t = str(x.t, 12), on = p.conc && p.conc === str(x.n, 80), unprep = x.p === 0 || x.p === '0';
-        return '<li class="' + (on ? 'concing' : '') + (unprep ? ' unprep' : '') + '"><span class="sp-n">' + esc(str(x.n, 80)) + '</span>' +
+        return '<li class="' + (on ? 'concing' : '') + (unprep ? ' unprep' : '') + '"><span class="sp-n" data-link="spell">' + esc(str(x.n, 80)) + '</span>' +
           (x.conc ? '<a class="mk c" href="' + RULES + 'concentration" target="_blank" rel="noopener" title="Concentration (rules)">C</a>' : '') + (x.rit ? '<abbr class="mk r" title="Ritual">R</abbr>' : '') +
           (x.always ? '<span class="tag soft" title="Always prepared (subclass or feature)">always</span>' : '') +
           (x.other ? '<span class="tag soft" title="From a feat or item">feat/item</span>' : '') +
           (unprep ? '<span class="tag soft" title="In the spellbook, not prepared">not prepared</span>' : '') +
           '<span class="sp-m">' + esc(TIME[t] || t) + (x.r ? ' &middot; ' + esc(str(x.r, 30)) : '') + '</span></li>';
       };
-      h += '<div class="spells"><h4>Spells' + (m.M.list ? ' <span class="muted">&middot; ' + esc(str(m.M.list, 60)) + '</span>' : '') + '</h4>' +
+      h += '<div class="spells" data-links><h4>Spells' + (m.M.list ? ' <span class="muted">&middot; ' + esc(str(m.M.list, 60)) + '</span>' : '') + '</h4>' +
         (all.length ? groups.map(function (g) {
           var lv = Object.keys(g.by).map(Number).sort(function (a, b) { return a - b; });
           return (multi ? '<h5 class="sp-cls">' + esc(g.cls ? cap(g.cls) : 'Other') + '</h5>' : '') + lv.map(function (l) {
@@ -433,6 +435,7 @@
   var main = $('sheet');
   main.addEventListener('click', function (e) {
     var b = e.target.closest('[data-a]'); if (!b || !cur) return;
+    if (b.getAttribute('data-a') === 'dice') { if (window.DndDice) DndDice.open(); return; }
     var a = b.getAttribute('data-a'), id = cur.id, m = model(cur);
     if (a === 'pip') {
       var key = b.getAttribute('data-p'), i = +b.getAttribute('data-i'), on = b.classList.contains('on'), next = on ? i : i + 1;   // tap a filled pip: down to it; an empty one: up to it
