@@ -86,6 +86,16 @@ A character made on one site is available on every other site. All the sites are
   - **Unknown `?char=` id:** say so briefly ("That character isn't in this browser") rather than ignoring it.
 - **Accessibility for drop-downs and pickers:** Escape closes them and returns focus to the button that opened them, they stay inside the screen at 375 px, and re-rendering a list after a filter change keeps focus on the control the user used.
 
+## 6d. Motion and charts (`shared/motion.js`, `shared/ui.js`, `shared/chart.js`, v1.8)
+Copy all three unchanged into `site/` (like `character.js`). Load them at the end of `<body>`, after the site's own scripts:
+`<script src="motion.js?v=dev" defer></script><script src="ui.js?v=dev" defer></script>`, plus `<script src="chart.js?v=dev"></script>` before your own script if the site draws charts.
+- **Motion** is [motion.dev](https://motion.dev)'s plain-JS build (14.9.0, MIT), vendored unchanged. Don't load it from a CDN. To upgrade, change it here and re-copy it.
+- **Reveal:** put `data-reveal` on a container (a card grid, a result list). Its children fade and rise in as they reach the viewport; later re-renders just show. Lists you render after load are picked up automatically. Don't put it on a list of hundreds of rows; use it on cards and sections.
+- **Spotlight:** `data-spot` on a card adds a soft light that follows the pointer (the Kokonut UI card look, done in CSS).
+- **`DndUI`:** `enter(el)` for a new toast/dialog/card, `pop(el)` for a "copied" moment, `count(el, n)` to tween a number, `reveal(root)` after big changes, `DndUI.reduced`.
+- **Charts (`DndPlot`):** `DndPlot.line(el, {...})` and `DndPlot.bars(el, {...})`, in the look of bklit UI: thin 2 px lines, soft area fill, a crosshair tooltip, arrow-key reading, and a "Show as table" view. Use `curve: 'step'` for per-level values. Up to 3 series; their colours (`--p1..--p3`, set in the shared CSS for both themes) were checked for colour-blind separation, and series 2 and 3 are also dashed and dotted, so colour is never the only cue. Give every chart a `title`, an `xLabel` and a heading on the page.
+- **Rules:** motion is decoration, never content. With "reduce motion" on, or if Motion fails to load, everything shows at once (ui.js unhides after 2.5 s at most). Nothing animates on every keystroke. Print shows everything.
+
 ## 7. Checks before pushing
 - At 375 px and at desktop width, in light and dark, `index.html` and `changes.html` show no horizontal scroll and no console errors.
 - Every footer link resolves. The theme carries across sites.
@@ -96,6 +106,7 @@ A character made on one site is available on every other site. All the sites are
 - Sites that are already live are pushed without asking again. Only a new public repo needs Chris's yes.
 
 ## Revisions
+- v1.8 (2026-11-18): motion and charts (section 6d): vendored Motion 14.9.0, `ui.js` (reveal, spotlight, enter/pop/count) and `chart.js` (`DndPlot` line/bar charts) ported from the Kokonut UI and bklit UI looks to plain JS; `character.js` v1.3 animates the share prompt; `.char-import` no longer centres with transform.
 - v1.7 (2026-11-15): character share links (`character.js` v1.2: `shareUrl`, `copyShare`, `setShare`, `takeInbox`, the `#dndchar=` import prompt, and a Share button in the header switcher); CSS for `.char-share` and `.char-import`.
 - v1.6.2 (2026-11-14): light `--muted` is #5c665f (was #6f7a72, 3.7-4.4:1; now 5.0:1 or better on every light surface).
 - v1.6.1 (2026-11-14): `character.js` v1.1 (deleting the active character leaves none active) and the syncing and drop-down rules in section 6c.

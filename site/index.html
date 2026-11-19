@@ -50,29 +50,29 @@
     <p>Quick, searchable references for building and playing characters. Each tool covers both the 2014 and 2024 rules and runs entirely in your browser.</p>
   </section>
 
-  <section class="tools" aria-label="Tools">
-    <a class="tool" href="https://wernercd.github.io/dnd-druid-wildshapes/">
+  <section class="tools" aria-label="Tools" data-reveal>
+    <a class="tool" data-spot href="https://wernercd.github.io/dnd-druid-wildshapes/">
       <span class="ico"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M20 4a12 12 0 1 0 8 20A10 10 0 0 1 20 4z"/></svg></span>
       <h3>Wild Shape Beast List</h3>
       <p>Every beast a druid can become, filtered by level for standard and Circle of the Moon druids.</p>
       <ul><li>Full SRD stat blocks in both editions</li><li>Damage per round and feature filters</li><li>Star your known forms</li></ul>
       <span class="go">Open Wild Shape &rarr;</span>
     </a>
-    <a class="tool" href="https://wernercd.github.io/dnd-items/">
+    <a class="tool" data-spot href="https://wernercd.github.io/dnd-items/">
       <span class="ico"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2l11 7v14l-11 7-11-7V9z"/></svg></span>
       <h3>Item Finder</h3>
       <p>Magic items and gear, searchable by type, rarity, attunement and source book.</p>
       <ul><li>Full SRD 5.1 and 5.2 text</li><li>Index of items from later books</li><li>Filters saved in the link</li></ul>
       <span class="go">Open Item Finder &rarr;</span>
     </a>
-    <a class="tool" href="https://wernercd.github.io/dnd-multiclass-planner/">
+    <a class="tool" data-spot href="https://wernercd.github.io/dnd-multiclass-planner/">
       <span class="ico"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3l3.5 8.5L28 13l-6.5 6 1.8 9L16 23.5 8.7 28l1.8-9L4 13l8.5-1.5z"/></svg></span>
       <h3>Multiclass Planner</h3>
       <p>Plan a multiclass build of up to three classes, level by level, for 2014 or 2024 rules: spell slots, Pact Magic, features, resources and milestones.</p>
       <ul><li>2014 and 2024 rules</li><li>Pact slots kept separate from spell slots</li><li>Presets and shareable build links</li></ul>
       <span class="go">Open Planner &rarr;</span>
     </a>
-    <a class="tool" href="https://wernercd.github.io/dnd-magic/">
+    <a class="tool" data-spot href="https://wernercd.github.io/dnd-magic/">
       <span class="ico"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M14 3c1 6.5 4.5 10 11 11-6.5 1-10 4.5-11 11-1-6.5-4.5-10-11-11 6.5-1 10-4.5 11-11z"/><path d="M25 19c.5 3 2 4.5 5 5-3 .5-4.5 2-5 5-.5-3-2-4.5-5-5 3-.5 4.5-2 5-5z"/></svg></span>
       <h3>Spell Planner</h3>
       <p>Browse every class and subclass spell list, then pick and rank the spells you want for a character.</p>
@@ -84,7 +84,7 @@
   <section class="chars" id="characters" aria-labelledby="charsH">
     <h2 id="charsH">Characters</h2>
     <p class="intro">Your characters are shared by every tool. A Paladin built in the Multiclass Planner opens in the Spell Planner with its Paladin spell list, level and spellcasting modifier already set. A druid's level and circle carry over to Wild Shape. Characters are stored only in this browser. Use a character's Share link to send it to another device or to another player, or Export to back them all up.</p>
-    <ul class="char-list" id="charList"></ul>
+    <ul class="char-list" id="charList" data-reveal></ul>
     <form class="new-char" id="newChar">
       <h3>Quick character</h3>
       <div class="nc-row">
@@ -125,5 +125,7 @@
 <script src="character.js?v=dev"></script>
 <script src="hub.js?v=dev"></script>
 <script src="version.js?v=dev"></script>
+<script src="motion.js?v=dev" defer></script>
+<script src="ui.js?v=dev" defer></script>
 </body>
 </html>

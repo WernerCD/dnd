@@ -63,7 +63,7 @@ for site in SITES:
     css = (repo / "site" / "styles.css").read_text(encoding="utf-8")
     blk = shared_block(css)
     (ok if blk == canon_css else bad)(site, f"styles.css shared block matches {canon_ver}" if blk == canon_css else f"styles.css shared block differs from {canon_ver} (found {blk and re.search(r'v[\d.]+', blk).group(0)})")
-    for js in ["theme.js", "version.js", "character.js"]:
+    for js in ["theme.js", "version.js", "character.js", "motion.js", "ui.js"] + (["chart.js"] if (repo / "site" / "chart.js").exists() else []):
         canon = (HUB / "shared" / js).read_text(encoding="utf-8").replace("\r\n", "\n")
         f = repo / "site" / js
         if not f.exists(): bad(site, f"site/{js} missing"); continue
@@ -106,6 +106,7 @@ for site in SITES:
         if missing: probs.append("footer missing " + ", ".join(m.replace(BASE, "") for m in missing))
         if page == "" and 'id="charPick"' not in html: probs.append("no character picker")
         if page == "" and 'src="character.js?v=' not in html: probs.append("no character.js")
+        if page == "" and ('src="motion.js?v=' not in html or 'src="ui.js?v=' not in html): probs.append("no motion.js/ui.js (STYLE 6d)")
         if page == "" and site != "dnd" and 'href="https://wernercd.github.io/dnd/"' not in html: probs.append("no back-link to hub")
         v = re.search(r'styles\.css\?v=([0-9a-z]+)', html)
         if v and v.group(1) != "dev" and not head.startswith(v.group(1)[:7]): probs.append(f"live page is {v.group(1)}, repo HEAD is {head}")
