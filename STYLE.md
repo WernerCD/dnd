@@ -32,6 +32,8 @@ Both pages use the same header and footer. `changes.html` loads the site's own `
 - The brand row: logo SVG with class `logo`, `<h1>` (linked to `./` on the changes page), tagline, and the theme button `#themeBtn` with the moon icon.
 - On the hub, the left link is `D&D Toolbox` itself, marked `aria-current="page"` on its index, and the nav holds only `Changes`.
 
+- **Tool menu (v1.11):** every page loads `nav.js` (copied unchanged from `shared/nav.js`) right after `theme.js`. It puts centred drop-down menus (Characters, Build, Play, Run) into the top bar by itself, with no markup needed; under 720 px they fold into one "Tools" menu. A new site or page is one line in `nav.js`'s MENU, then re-copy it to every site.
+
 ## 4. Footer (`shared/footer.html`)
 The same on every page of every site:
 - The link row: D&D Toolbox · Wild Shape Beast List · Item Finder · Multiclass Planner · Changes · Source code (the repo) · Report a problem (the repo's issues). Mark the current site with `aria-current="page"`.
@@ -131,6 +133,7 @@ A tool that can use it (spells, feats, items, the planner) checks `ch.imp` on lo
 - Sites that are already live are pushed without asking again. Only a new public repo needs Chris's yes.
 
 ## Revisions
+- v1.11 (2026-11-19): `shared/nav.js` and CSS v1.9: centred drop-down menus of every page in the top bar.
 - v1.10 (2026-11-19): `shared/sources.js` and the source picker rule (6f: core books first and on by default, partner books listed but off); `character.js` v1.6 keeps `imp`, the imported-character summary (6g).
 - v1.9.1 (2026-11-18): `character.js` v1.5: opening a share link for a character you already have (same classes and scores) now takes its newer sheet summaries instead of ignoring them.
 - v1.9 (2026-11-18): `character.js` v1.4 adds `sheet` / `setSheet` (section 6e) for the new Character Sheet and Party pages; sheet summaries travel in share links (`s`).
