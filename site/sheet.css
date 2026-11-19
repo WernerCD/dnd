@@ -80,6 +80,10 @@
 .chip { font: inherit; font-size: .85rem; min-height: 36px; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink-2); cursor: pointer; }
 .chip.on { background: var(--warn-bg); border-color: var(--warn); color: var(--warn); font-weight: 600; }
 .chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.chipw { display: inline-flex; align-items: center; gap: 2px; }
+.rule-link { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; font-size: .72rem; font-weight: 700; color: var(--muted); text-decoration: none; border: 1px solid var(--line); vertical-align: middle; }
+.rule-link:hover, .rule-link:focus-visible { color: var(--accent); border-color: var(--accent); }
+a.mk { cursor: pointer; }
 .exh { display: inline-flex; align-items: center; gap: 8px; }
 .exh-n { min-width: 1.4em; text-align: center; font-size: 1.15rem; font-variant-numeric: tabular-nums; }
 .exh-t { font-size: .85rem; flex-basis: 100%; }
@@ -202,7 +206,7 @@ h5.sp-cls { column-span: all; font-family: Fraunces, Georgia, serif; font-size: 
 @media print {
   @page { margin: 12mm; }
   body { font-size: 10.5pt; }
-  .sheet-page .site-header, .sheet-page .site-footer, .sh-ctl, .sh-foot, .sh-toast, .sh-src, .sh-missing a, .chips, .pt-pick, .pt-acts, .pt-chart-tabs { display: none !important; }
+  .sheet-page .site-header, .sheet-page .site-footer, .rule-link, .sh-ctl, .sh-foot, .sh-toast, .sh-src, .sh-missing a, .chips, .pt-pick, .pt-acts, .pt-chart-tabs { display: none !important; }
   .print-only { display: block; }
   .sheet { padding-top: 0; }
   .sh-top { margin-bottom: 8px; }

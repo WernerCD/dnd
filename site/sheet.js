@@ -37,6 +37,8 @@
   var TIME = { '1A': 'Action', '1BA': 'Bonus action', '1R': 'Reaction', '1m': '1 minute', '10m': '10 minutes', '1h': '1 hour', '8h': '8 hours', '12h': '12 hours', '24h': '24 hours' };
   var HD = { barbarian: 12, fighter: 10, paladin: 10, ranger: 10, sorcerer: 6, wizard: 6 };   // every other class: d8
   var PKEY = 'dnd.sheet.play';
+  var RULES = 'https://wernercd.github.io/dnd-rules/#';
+  function rule(id, label, cls) { return '<a class="rule-link' + (cls ? ' ' + cls : '') + '" href="' + RULES + id + '" target="_blank" rel="noopener" aria-label="' + esc(label) + ' rules (Rules Reference)" title="' + esc(label) + ' rules">?</a>'; }
 
   // ---------- data from the shared record and the summaries ----------
   function sum(ch, repo) { var s = ch && ch.sheet && ch.sheet[repo]; return s && typeof s === 'object' && !Array.isArray(s) ? s : null; }
@@ -175,7 +177,7 @@
         m.hd.map(function (x) { var used = Math.min(p.hd['d' + x.d] || 0, x.n); return '<span class="pipgrp"><b>d' + x.d + '</b> ' + pips('hd:' + x.d, x.n, x.n - used, 'd' + x.d + ' hit dice') + '</span>'; }).join('') + '</span></div>';
     }
     var down = cur === 0;
-    h += '<div class="sh-row ds' + (down ? ' down' : '') + '"><span class="sh-lbl">Death saves' + (down ? ' <b class="warn">at 0 HP</b>' : '') + '</span><span class="sh-pipset">' +
+    h += '<div class="sh-row ds' + (down ? ' down' : '') + '"><span class="sh-lbl">Death saves ' + rule('death-saves', 'Death saving throw') + (down ? ' <b class="warn">at 0 HP</b>' : '') + '</span><span class="sh-pipset">' +
       '<span class="pipgrp">Successes ' + pips('ds:0', 3, p.ds[0], 'Death save successes') + '</span>' +
       '<span class="pipgrp fail">Failures ' + pips('ds:1', 3, p.ds[1], 'Death save failures') + '</span></span></div>' +
       (p.ds[1] >= 3 ? '<p class="sh-note warn">Three failures: the character dies.</p>' : p.ds[0] >= 3 ? '<p class="sh-note">Three successes: stable at 0 HP.</p>' : '');
@@ -189,13 +191,13 @@
     if (p.conc && concs.indexOf(p.conc) < 0) concs.unshift(p.conc);
     var h = '<div class="chips" role="group" aria-label="Conditions">' + CONDS.map(function (c) {
       var on = p.cond.indexOf(c) >= 0;
-      return '<button type="button" class="chip' + (on ? ' on' : '') + '" data-a="cond" data-c="' + c + '" data-k="cond:' + c + '" aria-pressed="' + on + '">' + c + '</button>';
+      return '<span class="chipw"><button type="button" class="chip' + (on ? ' on' : '') + '" data-a="cond" data-c="' + c + '" data-k="cond:' + c + '" aria-pressed="' + on + '">' + c + '</button>' + rule('condition-' + c.toLowerCase(), c) + '</span>';
     }).join('') + '</div>' +
       '<p class="print-only">Conditions: ________________________________</p>' +
-      '<div class="sh-row"><span class="sh-lbl">Exhaustion</span><span class="exh"><button type="button" class="btn sq" data-a="exh-" data-k="exh-" aria-label="Less exhaustion">&minus;</button>' +
+      '<div class="sh-row"><span class="sh-lbl">Exhaustion ' + rule('condition-exhaustion', 'Exhaustion') + '</span><span class="exh"><button type="button" class="btn sq" data-a="exh-" data-k="exh-" aria-label="Less exhaustion">&minus;</button>' +
       '<b class="exh-n" aria-live="polite">' + p.exh + '</b><button type="button" class="btn sq" data-a="exh+" data-k="exh+" aria-label="More exhaustion">+</button></span>' +
       '<span class="exh-t' + (p.exh ? ' warn' : ' muted') + '">' + esc(exhTxt) + '</span></div>' +
-      '<div class="sh-row sh-ctl"><label class="sh-lbl" for="concSel">Concentrating on</label><select id="concSel"><option value="">Nothing</option>' +
+      '<div class="sh-row sh-ctl"><span class="sh-lbl"><label for="concSel">Concentrating on</label> ' + rule('concentration', 'Concentration') + '</span><select id="concSel"><option value="">Nothing</option>' +
       concs.map(function (n) { return '<option' + (n === p.conc ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('') + '</select></div>';
     return card('cond', 'Conditions', '', h);
   }
@@ -233,7 +235,7 @@
       var item = function (x) {
         var t = str(x.t, 12), on = p.conc && p.conc === str(x.n, 80), unprep = x.p === 0 || x.p === '0';
         return '<li class="' + (on ? 'concing' : '') + (unprep ? ' unprep' : '') + '"><span class="sp-n">' + esc(str(x.n, 80)) + '</span>' +
-          (x.conc ? '<abbr class="mk c" title="Concentration">C</abbr>' : '') + (x.rit ? '<abbr class="mk r" title="Ritual">R</abbr>' : '') +
+          (x.conc ? '<a class="mk c" href="' + RULES + 'concentration" target="_blank" rel="noopener" title="Concentration (rules)">C</a>' : '') + (x.rit ? '<abbr class="mk r" title="Ritual">R</abbr>' : '') +
           (x.always ? '<span class="tag soft" title="Always prepared (subclass or feature)">always</span>' : '') +
           (x.other ? '<span class="tag soft" title="From a feat or item">feat/item</span>' : '') +
           (unprep ? '<span class="tag soft" title="In the spellbook, not prepared">not prepared</span>' : '') +
@@ -292,10 +294,13 @@
     });
     fo.forEach(function (f) { if (!f.used) list.push(f); });
     list.forEach(function (f) { if (f.lvl && f.lvl > m.lvl) f.later = true; });
-    h += '<h4>Feats</h4>' + (list.length ? '<ul class="feats">' + list.map(function (f) {
+    var planned = list.filter(function (f) { return f.st === 'planned'; }), have = list.filter(function (f) { return f.st !== 'planned'; });
+    var li = function (f) {
       return '<li' + (f.later ? ' class="unprep"' : '') + '>' + (f.lvl ? '<span class="lv">L' + f.lvl + '</span>' : '') + '<span' + (f.slot ? ' class="muted"' : '') + '>' + esc(f.n) + '</span>' + (f.cat ? '<span class="muted small"> ' + esc(f.cat) + '</span>' : '') +
-        (f.st === 'planned' ? '<span class="tag soft">planned</span>' : '') + (f.later ? '<span class="tag soft">at level ' + f.lvl + '</span>' : '') + '</li>';
-    }).join('') + '</ul>' : (P || F ? '<p class="muted">No feats yet.</p>' : missing(m, 'feats', 'feats, species and background')));
+        (f.later ? '<span class="tag soft">at level ' + f.lvl + '</span>' : '') + '</li>';
+    };
+    h += '<h4>Feats</h4>' + (have.length ? '<ul class="feats">' + have.map(li).join('') + '</ul>' : (P || F ? '<p class="muted">No feats yet.</p>' : missing(m, 'feats', 'feats, species and background'))) +
+      (planned.length ? '<h4>Planned feats</h4><ul class="feats">' + planned.map(li).join('') + '</ul>' : '');
     if (P) {
       var by = {}, order = [];
       var later = 0;
