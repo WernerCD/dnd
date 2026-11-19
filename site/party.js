@@ -28,7 +28,8 @@
   function levelOf(ch) { var P = sum(ch, REPOS.planner), N = nowOf(ch); return (N && int(N.lvl, 1, 20)) || C.level(ch) || int(P && P.lvl, 1, 20) || 1; }
   function maxHp(ch) {
     var P = sum(ch, REPOS.planner), N = nowOf(ch), p = play(ch.id) || {}, pl = int(P && P.lvl, 1, 20), ahead = !N && pl && C.level(ch) && pl > C.level(ch);
-    return (N ? int(N.hp, 1, 999) : !ahead && int(P && P.hp, 1, 999)) || int(p.max, 1, 999) || null;
+    var IM = sum(ch, 'import');   // the hub importer's summary (Characters page)
+    return (N ? int(N.hp, 1, 999) : (!ahead && int(P && P.hp, 1, 999)) || int(IM && IM.hp, 1, 999)) || int(p.max, 1, 999) || null;
   }
   function passivePrc(ch) {   // from the planner's (or importer's) skills: 10 + Wis + proficiency (doubled with expertise)
     var P = sum(ch, REPOS.planner), sk = (P && P.skills) || field(ch, 'skills'); if (!sk || typeof sk !== 'object') return null;
@@ -111,7 +112,7 @@
     var P = sum(ch, REPOS.planner), p = play(ch.id) || {};
     var lvl = levelOf(ch), max = maxHp(ch);
     var cur = p.hp == null ? max : int(p.hp, 0, 999); if (max && cur != null) cur = Math.min(cur, max);
-    var ac = num(field(ch, 'ac')), pv = field(ch, 'passive'), prc = passivePrc(ch); if (prc == null && pv && typeof pv === 'object') prc = num(pv.prc);
+    var ac = num(field(ch, 'ac')), pv = field(ch, 'passive'), prc = pv && typeof pv === 'object' && num(pv.prc) != null ? num(pv.prc) : passivePrc(ch);
     var below = lvl < (int(P && P.lvl, 1, 20) || 0), pbNow = Math.ceil(lvl / 4) + 1;   // plan ahead: 8 + current proficiency + modifier
     var dcs = arr(P && P.dc).map(function (d) { if (!d) return null; var i = ['str', 'dex', 'con', 'int', 'wis', 'cha'].indexOf(String(d.abil || '').toLowerCase().slice(0, 3)); return below && i >= 0 ? 8 + pbNow + abMod(ch, i) : int(d.dc, 1, 40); }).filter(Boolean);
     var stats = [

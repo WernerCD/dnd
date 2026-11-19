@@ -50,7 +50,7 @@
   }
   function isCaster(ch) { return ch.classes.some(function (x) { return CASTERS.indexOf(x.cls) >= 0 || THIRD.test(x.subName || x.sub || ''); }); }
   function model(ch) {
-    var P = sum(ch, TOOL.planner.repo), M = sum(ch, TOOL.magic.repo), W = sum(ch, TOOL.wild.repo), F = sum(ch, TOOL.feats.repo), I = sum(ch, TOOL.items.repo);
+    var IM = sum(ch, 'import'), P = sum(ch, TOOL.planner.repo), M = sum(ch, TOOL.magic.repo), W = sum(ch, TOOL.wild.repo), F = sum(ch, TOOL.feats.repo), I = sum(ch, TOOL.items.repo);
     // the planner's summary is for the full planned build; the shared record's classes are where the character is now
     // The planner's summary is for the full planned build. When the character is below it, the planner adds
     // now: {lvl, src, hp, slots, pact?, res?} at the current level. The shared record's classes equal the plan.
@@ -64,8 +64,9 @@
       pb: (!ahead && int(P && P.pb, 2, 6)) || Math.ceil(lvl / 4) + 1, pbGuess: ahead || !(P && num(P.pb)),
       ab: ab, abFromPlanner: ab !== ch.ab,
       mod: function (a) { return Math.floor((ab[ABIL.indexOf(a)] - 10) / 2); },
-      saves: arr(P && P.saves).map(function (s) { return String(s).toLowerCase().slice(0, 3); }),
-      hp: N ? int(N.hp, 1, 999) : ahead ? null : int(P && P.hp, 1, 999), planHp: int(P && P.hp, 1, 999),
+      saves: arr(P && arr(P.saves).length ? P.saves : IM && IM.saves).map(function (s) { return String(s).toLowerCase().slice(0, 3); }),
+      hp: N ? int(N.hp, 1, 999) : (!ahead && int(P && P.hp, 1, 999)) || int(IM && IM.hp, 1, 999), planHp: int(P && P.hp, 1, 999),
+      hpFromImport: !N && !(!ahead && int(P && P.hp, 1, 999)) && !!int(IM && IM.hp, 1, 999),
       hd: N ? (N.hd ? parseHD(N.hd) : Array.isArray(N.classes) && N.classes.length ? hdFromClasses({ classes: N.classes.filter(function (x) { return x && x.cls; }).map(function (x) { return { cls: str(x.cls, 30).toLowerCase(), lvl: int(x.lvl, 1, 20) || 1 }; }) }) : single ? hdFromClasses(ch, lvl) : []) : ahead || !(P && P.hd) ? hdFromClasses(ch) : parseHD(P.hd),
       hdUnknown: !!(N && !N.hd && !single && !(Array.isArray(N.classes) && N.classes.length)),
       // now.classes: the class levels at the current level, in the order they were first taken
@@ -165,9 +166,9 @@
       m.ac != null ? ['AC', m.ac] : null,
       ['Initiative', sign(m.init != null ? m.init : m.mod('dex'))],
       m.speed != null ? ['Speed', esc(str(m.speed, 20))] : null,
-      m.skills ? ['Passive Perception', passiveFrom(m, 'percep', 'wis')] : pv && num(pv.prc) != null ? ['Passive Perception', num(pv.prc)] : ['Passive Wisdom', wisP, 'Passive Perception before any proficiency: 10 + Wisdom modifier'],
-      m.skills ? ['Passive Insight', passiveFrom(m, 'insight', 'wis')] : pv && num(pv.ins) != null ? ['Passive Insight', num(pv.ins)] : null,
-      m.skills ? ['Passive Investigation', passiveFrom(m, 'investig', 'int')] : pv && num(pv.inv) != null ? ['Passive Investigation', num(pv.inv)] : null,
+      pv && num(pv.prc) != null ? ['Passive Perception', num(pv.prc)] : m.skills ? ['Passive Perception', passiveFrom(m, 'percep', 'wis')] : ['Passive Wisdom', wisP, 'Passive Perception before any proficiency: 10 + Wisdom modifier'],
+      pv && num(pv.ins) != null ? ['Passive Insight', num(pv.ins)] : m.skills ? ['Passive Insight', passiveFrom(m, 'insight', 'wis')] : null,
+      pv && num(pv.inv) != null ? ['Passive Investigation', num(pv.inv)] : m.skills ? ['Passive Investigation', passiveFrom(m, 'investig', 'int')] : null,
       m.attacks ? ['Attacks', m.attacks + ' per action'] : null
     ].filter(Boolean);
     var srcTxt = m.N ? (m.N.src === 'import' ? ' (from the imported character)' : m.N.src === 'at' ? ' (the planner\'s "At level" setting)' : '') : '';
@@ -191,6 +192,7 @@
       '<div class="sh-ctl hp-ctl"><label class="sr" for="hpAmt">Amount</label><input id="hpAmt" type="number" inputmode="numeric" min="0" max="999" placeholder="Amount" value="' + esc(amt) + '">' +
       '<button type="button" class="btn dmg" data-a="dmg" data-k="dmg">Damage</button><button type="button" class="btn heal" data-a="heal" data-k="heal">Heal</button>' +
       '<button type="button" class="btn" data-a="temp" data-k="temp" title="Temporary hit points don\'t stack: this replaces them">Temp HP</button></div>';
+    if (m.hpFromImport) h += '<p class="sh-note">Max HP from the <a href="characters.html">imported character</a>.</p>';
     if (!m.hp) h += '<div class="sh-ctl hp-setmax"><label>Max HP <input id="hpMax" type="number" inputmode="numeric" min="1" max="999" value="' + (p.max || '') + '"></label>' +
       (m.ahead && m.planHp ? '<span class="muted small">The plan\'s ' + m.planHp + ' HP is for level ' + m.planLvl + '.</span>' : m.P ? '<span class="muted small">The planner has no HP for this character.</span>' : '') + '</div>';
     if (m.hdUnknown) h += '<p class="sh-note">Hit dice at level ' + m.lvl + ' aren\'t known for this multiclass build.</p>';
