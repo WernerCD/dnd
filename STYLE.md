@@ -118,6 +118,7 @@ Unknown fields are ignored, so a tool can add more later; tell the hub session s
 - Sites that are already live are pushed without asking again. Only a new public repo needs Chris's yes.
 
 ## Revisions
+- v1.9.1 (2026-11-18): `character.js` v1.5: opening a share link for a character you already have (same classes and scores) now takes its newer sheet summaries instead of ignoring them.
 - v1.9 (2026-11-18): `character.js` v1.4 adds `sheet` / `setSheet` (section 6e) for the new Character Sheet and Party pages; sheet summaries travel in share links (`s`).
 - v1.8 (2026-11-18): motion and charts (section 6d): vendored Motion 14.9.0, `ui.js` (reveal, spotlight, enter/pop/count) and `chart.js` (`DndPlot` line/bar charts) ported from the Kokonut UI and bklit UI looks to plain JS; `character.js` v1.3 animates the share prompt; `.char-import` no longer centres with transform.
 - v1.7 (2026-11-15): character share links (`character.js` v1.2: `shareUrl`, `copyShare`, `setShare`, `takeInbox`, the `#dndchar=` import prompt, and a Share button in the header switcher); CSS for `.char-share` and `.char-import`.
