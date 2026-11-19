@@ -65,8 +65,11 @@
       ab: ab, abFromPlanner: ab !== ch.ab,
       mod: function (a) { return Math.floor((ab[ABIL.indexOf(a)] - 10) / 2); },
       saves: arr(P && arr(P.saves).length ? P.saves : IM && IM.saves).map(function (s) { return String(s).toLowerCase().slice(0, 3); }),
-      hp: N ? int(N.hp, 1, 999) : (!ahead && int(P && P.hp, 1, 999)) || int(IM && IM.hp, 1, 999), planHp: int(P && P.hp, 1, 999),
-      hpFromImport: !N && !(!ahead && int(P && P.hp, 1, 999)) && !!int(IM && IM.hp, 1, 999),
+      // Max HP: the imported sheet's real maximum when it is for this level (no now{}, or now taken from the import);
+      // otherwise the planner's average at the current level (now.hp), or its plan HP when the plan isn't ahead.
+      hpFromImport: !!int(IM && IM.hp, 1, 999) && (!N || N.src === 'import'),
+      avgHp: N ? int(N.hp, 1, 999) : (!ahead && int(P && P.hp, 1, 999)) || null,
+      planHp: int(P && P.hp, 1, 999),
       hd: N ? (N.hd ? parseHD(N.hd) : Array.isArray(N.classes) && N.classes.length ? hdFromClasses({ classes: N.classes.filter(function (x) { return x && x.cls; }).map(function (x) { return { cls: str(x.cls, 30).toLowerCase(), lvl: int(x.lvl, 1, 20) || 1 }; }) }) : single ? hdFromClasses(ch, lvl) : []) : ahead || !(P && P.hd) ? hdFromClasses(ch) : parseHD(P.hd),
       hdUnknown: !!(N && !N.hd && !single && !(Array.isArray(N.classes) && N.classes.length)),
       // now.classes: the class levels at the current level, in the order they were first taken
@@ -83,6 +86,7 @@
       ac: num(firstField(ch, 'ac')), speed: firstField(ch, 'speed'), init: num(firstField(ch, 'init')), passive: firstField(ch, 'passive'),
       resist: firstField(ch, 'resist'), immune: firstField(ch, 'immune')
     };
+    m.hp = m.hpFromImport ? int(IM.hp, 1, 999) : m.avgHp;
     if (m.pact && !m.pact.n) m.pact = null;
     m.caster = isCaster(ch) || !!M || m.slots.some(Boolean) || !!m.pact || m.dc.length > 0;
     m.druid = C.levelIn(ch, 'druid') > 0 || !!W;
@@ -192,7 +196,7 @@
       '<div class="sh-ctl hp-ctl"><label class="sr" for="hpAmt">Amount</label><input id="hpAmt" type="number" inputmode="numeric" min="0" max="999" placeholder="Amount" value="' + esc(amt) + '">' +
       '<button type="button" class="btn dmg" data-a="dmg" data-k="dmg">Damage</button><button type="button" class="btn heal" data-a="heal" data-k="heal">Heal</button>' +
       '<button type="button" class="btn" data-a="temp" data-k="temp" title="Temporary hit points don\'t stack: this replaces them">Temp HP</button></div>';
-    if (m.hpFromImport) h += '<p class="sh-note">Max HP from the <a href="characters.html">imported character</a>.</p>';
+    if (m.hpFromImport) h += '<p class="sh-note">Max HP from the <a href="characters.html">imported character</a>' + (m.avgHp && m.avgHp !== m.hp ? '; the planner\'s average is ' + m.avgHp : '') + '.</p>';
     if (!m.hp) h += '<div class="sh-ctl hp-setmax"><label>Max HP <input id="hpMax" type="number" inputmode="numeric" min="1" max="999" value="' + (p.max || '') + '"></label>' +
       (m.ahead && m.planHp ? '<span class="muted small">The plan\'s ' + m.planHp + ' HP is for level ' + m.planLvl + '.</span>' : m.P ? '<span class="muted small">The planner has no HP for this character.</span>' : '') + '</div>';
     if (m.hdUnknown) h += '<p class="sh-note">Hit dice at level ' + m.lvl + ' aren\'t known for this multiclass build.</p>';

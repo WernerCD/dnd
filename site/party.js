@@ -29,7 +29,8 @@
   function maxHp(ch) {
     var P = sum(ch, REPOS.planner), N = nowOf(ch), p = play(ch.id) || {}, pl = int(P && P.lvl, 1, 20), ahead = !N && pl && C.level(ch) && pl > C.level(ch);
     var IM = sum(ch, 'import');   // the hub importer's summary (Characters page)
-    return (N ? int(N.hp, 1, 999) : (!ahead && int(P && P.hp, 1, 999)) || int(IM && IM.hp, 1, 999)) || int(p.max, 1, 999) || null;
+    if (int(IM && IM.hp, 1, 999) && (!N || N.src === 'import')) return int(IM.hp, 1, 999);   // the imported sheet's real maximum at this level
+    return (N ? int(N.hp, 1, 999) : !ahead && int(P && P.hp, 1, 999)) || int(p.max, 1, 999) || null;
   }
   function passivePrc(ch) {   // from the planner's (or importer's) skills: 10 + Wis + proficiency (doubled with expertise)
     var P = sum(ch, REPOS.planner), sk = (P && P.skills) || field(ch, 'skills'); if (!sk || typeof sk !== 'object') return null;
