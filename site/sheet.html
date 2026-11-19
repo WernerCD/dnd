@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Character Sheet · D&amp;D Toolbox</title>
+<meta name="description" content="A one-page D&amp;D 5e character sheet for play at the table, built from your D&amp;D Toolbox plans: HP, spell slots, resources, spells, Wild Shape forms, feats and items, with short and long rest buttons.">
+<meta name="theme-color" content="#f6f3ec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12171a" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://wernercd.github.io/dnd/sheet.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="D&amp;D Toolbox">
+<meta property="og:title" content="Character Sheet · D&amp;D Toolbox">
+<meta property="og:description" content="A one-page D&amp;D 5e character sheet for play at the table, built from your D&amp;D Toolbox plans: HP, spell slots, resources, spells, Wild Shape forms, feats and items, with short and long rest buttons.">
+<meta property="og:url" content="https://wernercd.github.io/dnd/sheet.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M8 3h12l5 5v21H8z' fill='%23c9a227'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script>try{var t=localStorage.getItem('dnd.theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script>window.SHEET_WANT=(function(){try{var m=/[?&]char=([^&#]+)/.exec(location.search);return m?decodeURIComponent(m[1]):null;}catch(e){return null;}})();</script>
+<link rel="stylesheet" href="styles.css?v=dev">
+<link rel="stylesheet" href="sheet.css?v=dev">
+</head>
+<body class="sheet-page">
+<header class="site-header">
+  <div class="wrap hub-bar">
+    <a href="./">&larr; D&amp;D Toolbox</a>
+    <span class="char-pick" id="charPick"></span>
+    <nav class="hub-nav" aria-label="Site">
+      <a href="sheet.html" aria-current="page">Sheet</a>
+      <a href="party.html">Party</a>
+      <a href="changes.html">Changes</a>
+    </nav>
+  </div>
+  <div class="wrap header-inner">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><path d="M8 3h12l5 5v21H8z"/></svg>
+      <div>
+        <h1>Character Sheet</h1>
+        <p class="tagline">Everything your tools know about a character, ready for the table</p>
+      </div>
+    </div>
+    <button id="themeBtn" class="icon-btn" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="wrap sheet" id="sheet">
+  <noscript><p>The character sheet needs JavaScript, because your characters are stored in this browser.</p></noscript>
+</main>
+<div class="sh-toast" id="shToast" role="status" aria-live="polite" hidden></div>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <ul class="foot-links">
+      <li><a href="./" aria-current="page">D&amp;D Toolbox</a></li>
+      <li><a href="https://wernercd.github.io/dnd-druid-wildshapes/">Wild Shape Beast List</a></li>
+      <li><a href="https://wernercd.github.io/dnd-items/">Item Finder</a></li>
+      <li><a href="https://wernercd.github.io/dnd-multiclass-planner/">Multiclass Planner</a></li>
+      <li><a href="https://wernercd.github.io/dnd-magic/">Spell Planner</a></li>
+      <li><a href="changes.html">Changes</a></li>
+      <li><a href="https://github.com/WernerCD/dnd" rel="noopener">Source code</a></li>
+      <li><a href="https://github.com/WernerCD/dnd/issues" rel="noopener">Report a problem</a></li>
+    </ul>
+    <p>Unofficial fan content, not affiliated with or endorsed by Wizards of the Coast. Rules text comes from the System Reference Documents 5.1 and 5.2 by Wizards of the Coast LLC, licensed under <a href="https://creativecommons.org/licenses/by/4.0/legalcode" rel="noopener">CC BY 4.0</a>.</p>
+  </div>
+</footer>
+<script src="theme.js?v=dev"></script>
+<script src="character.js?v=dev"></script>
+<script src="sheet.js?v=dev"></script>
+<script src="version.js?v=dev"></script>
+<script src="motion.js?v=dev" defer></script>
+<script src="ui.js?v=dev" defer></script>
+</body>
+</html>
