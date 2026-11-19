@@ -135,7 +135,7 @@ Every page that shows a creature's stat block draws it with `DndStatblock.html(m
 ## 6j. Hub search (`site/search.json`)
 Each tool site publishes `site/search.json` for the hub's "Search every tool" box:
 `{"v": 1, "items": [{"n": "Bag of Holding", "t": "Wondrous item, uncommon", "k": "Item", "u": "#item=bag-of-holding"}]}`
-`n` name (required), `t` one short detail line, `k` kind label (Spell, Item, Monster, Feat, Species, Background, Rule, Condition, Beast, Class...), `u` link relative to the site root that opens that entry (a deep link your site already understands; add one if it has none). Names and short facts only, the same copyright rule as the rest of the site: no rules text. One entry per name (merge 2014/2024 into one with the edition in `t` if it differs). Keep it under 600 KB; generate it with the site's data build (commit it, or build it in both CI jobs). The smoke test checks the shape.
+`n` name (required), `t` one short detail line, `k` kind label (Spell, Item, Monster, Feat, Species, Background, Rule, Condition, Beast, Class...), `u` link relative to the site root that opens that entry (optional `u14`: the link to the 2014 version when `u` opens the 2024 one; other tools' links use it for 2014 text) (a deep link your site already understands; add one if it has none). Names and short facts only, the same copyright rule as the rest of the site: no rules text. One entry per name (merge 2014/2024 into one with the edition in `t` if it differs). Keep it under 600 KB; generate it with the site's data build (commit it, or build it in both CI jobs). The smoke test checks the shape.
 
 ## 6k. Dice and links between tools (`shared/dice.js`, `shared/links.js`, CSS v1.11)
 - Copy both unchanged to `site/` and load them on every page that shows game text, at least the main page: `<script src="dice.js?v=dev"></script>` and `<script src="links.js?v=dev"></script>` after `offline.js`. Neither needs code from you: they work inside every `.dsb` stat block, and inside any element you mark `data-dice` (rolls) or `data-links` (links). Content you render later is picked up automatically. Opt a block out with `data-nodice` / `data-nolink`.
@@ -155,6 +155,7 @@ Each tool site publishes `site/search.json` for the hub's "Search every tool" bo
 - Sites that are already live are pushed without asking again. Only a new public repo needs Chris's yes.
 
 ## Revisions
+- v1.14.3 (2026-11-19): 6j: an item may add `u14`, the link to its 2014 entry when `u` opens the 2024 one; `links.js` v1.0.2 uses it for 2014 text (nearest `data-ed`, else `?ed=`), `statblock.js` v1.1.1 sets `data-ed`, `dice.js` v1.0.2 re-scans on a timer (works in hidden tabs).
 - v1.14.2 (2026-11-19): `links.js` v1.0.1: multi-word Title Case spell and magic item names link without italics (2024 SRD style), italics ending in `.` or `:` (run-in headings such as "Slow.") never link, and `data-nolink` works on the element itself.
 - v1.14.1 (2026-11-19): `dice.js` v1.0.1: rolls inside an open modal `<dialog>` show the tray in that dialog (top layer); `data-roll` must contain a die, so a site's own `data-roll="0"` is left alone (better still, use another attribute name).
 - v1.14 (2026-11-19): dice and links between tools (6k: `dice.js`, `links.js`, CSS v1.11, `statblock.js` v1.1) and smoke test v1.2.
