@@ -96,6 +96,18 @@ Copy all three unchanged into `site/` (like `character.js`). Load them at the en
 - **Charts (`DndPlot`):** `DndPlot.line(el, {...})` and `DndPlot.bars(el, {...})`, in the look of bklit UI: thin 2 px lines, soft area fill, a crosshair tooltip, arrow-key reading, and a "Show as table" view. Use `curve: 'step'` for per-level values. Up to 3 series; their colours (`--p1..--p3`, set in the shared CSS for both themes) were checked for colour-blind separation, and series 2 and 3 are also dashed and dotted, so colour is never the only cue. Give every chart a `title`, an `xLabel` and a heading on the page.
 - **Rules:** motion is decoration, never content. With "reduce motion" on, or if Motion fails to load, everything shows at once (ui.js unhides after 2.5 s at most). Nothing animates on every keystroke. Print shows everything.
 
+## 6e. Sheet summaries (`character.js` v1.4, for the Character Sheet and Party pages)
+The hub's **Character Sheet** (`/dnd/sheet.html?char=<id>`) and **Party** (`/dnd/party.html`) pages show what every tool knows about a character, without loading any tool's code. Each tool publishes a small, read-only summary for the active character whenever its state for that character changes:
+`DndChar.setSheet(id, '<repo>', summary)` (or `null` to clear it). Keep it under 6000 characters, plain JSON, and computed: final numbers, not inputs. Summaries travel inside share links, so a DM who opens a player's link sees the same sheet. The sheet pages never write to `sheet`; they keep play state (HP, slots used, conditions) in their own key.
+
+Every summary has `v: 1`, plus `ed: '2014'|'2024'` when it depends on the edition. Fields per tool (leave out what doesn't apply):
+- **dnd-multiclass-planner:** `lvl`, `pb` (proficiency bonus), `hp` (average max HP), `hd` (for example `"3d12+5d8"`), `saves` (`["str","con"]`), `ab` (final scores after ASIs, 6 numbers), `slots` (9 numbers, levels 1-9), `pact` (`{n, lvl}`), `dc` (`[{abil, dc, atk}]`, one per casting ability), `attacks` (attacks per Attack action), `res` (`[{name, max, per: "short"|"long"|"turn"|"day", note?}]`, for example Rage or Channel Divinity), `feats` (`[{lvl, name}]`), `features` (`[{lvl, cls, name}]`, names only), `prof` (`{armor, weapons, tools}` short strings).
+- **dnd-magic:** `spells` (`[{n, lvl, conc, rit, t, r}]`, the chosen and prepared spells; `t` is the casting time such as `"1A"`, `"1BA"`, `"1R"` or `"10m"`; `r` is the range), `list` (the list's name).
+- **dnd-druid-wildshapes:** `forms` (`[{n, cr, ac, hp, spd}]`, the starred or known forms), `uses` (Wild Shape uses), `maxcr`.
+- **dnd-feats:** `feats` (`[{n, cat, status: "taken"|"planned"}]`), `species`, `background`.
+- **dnd-items:** `items` (`[{n, rar, att}]`, items on the character's list), `attuned`.
+Unknown fields are ignored, so a tool can add more later; tell the hub session so the sheet can use them.
+
 ## 7. Checks before pushing
 - At 375 px and at desktop width, in light and dark, `index.html` and `changes.html` show no horizontal scroll and no console errors.
 - Every footer link resolves. The theme carries across sites.
@@ -106,6 +118,7 @@ Copy all three unchanged into `site/` (like `character.js`). Load them at the en
 - Sites that are already live are pushed without asking again. Only a new public repo needs Chris's yes.
 
 ## Revisions
+- v1.9 (2026-11-18): `character.js` v1.4 adds `sheet` / `setSheet` (section 6e) for the new Character Sheet and Party pages; sheet summaries travel in share links (`s`).
 - v1.8 (2026-11-18): motion and charts (section 6d): vendored Motion 14.9.0, `ui.js` (reveal, spotlight, enter/pop/count) and `chart.js` (`DndPlot` line/bar charts) ported from the Kokonut UI and bklit UI looks to plain JS; `character.js` v1.3 animates the share prompt; `.char-import` no longer centres with transform.
 - v1.7 (2026-11-15): character share links (`character.js` v1.2: `shareUrl`, `copyShare`, `setShare`, `takeInbox`, the `#dndchar=` import prompt, and a Share button in the header switcher); CSS for `.char-share` and `.char-import`.
 - v1.6.2 (2026-11-14): light `--muted` is #5c665f (was #6f7a72, 3.7-4.4:1; now 5.0:1 or better on every light surface).
