@@ -108,6 +108,19 @@ Every summary has `v: 1`, plus `ed: '2014'|'2024'` when it depends on the editio
 - **dnd-items:** `items` (`[{n, rar, att}]`, items on the character's list), `attuned`.
 Unknown fields are ignored, so a tool can add more later; tell the hub session so the sheet can use them.
 
+## 6f. Source pickers (`shared/sources.js`, v1.10)
+Every "Sources"/"Books" picker uses `DndSources` (copy `shared/sources.js` unchanged to `site/` and load it before your app script) so all sites behave the same:
+- **Order:** `DndSources.sort(keys)`, shown under group headings (`DndSources.info(k).groupName`): Core rules, Official supplements, Settings and adventures, Partner and licensed. Use `<div class="src-group">` for a heading row.
+- **Default:** only the core rules are ticked (`DndSources.defaults(keys)`: SRD 5.1/5.2, Player's Handbook, Dungeon Master's Guide, Monster Manual, both editions). Everything else stays listed and available, unticked.
+- **Buttons:** "Core books" (back to the default), "Select all", "Clear all".
+- **Remembering:** a reader's own choice (saved in your localStorage key, or in the URL) wins over the default. The default applies only when there is no saved choice; when the selection equals the default, leave it out of the URL. Changing edition or tab keeps the rule (core of the new list), never "all".
+- Books the table doesn't know go in Settings and adventures; tell the hub session so it can add them.
+
+## 6g. Imported characters (`character.js` v1.6: `imp`)
+The hub's Characters page imports a character from D&D Beyond (link or pasted JSON), a Foundry VTT dnd5e actor export or a Fight Club 5 XML export. It creates or updates the shared record and stores a names-only summary in `ch.imp` (never descriptions or rules text):
+`{v: 1, src: 'ddb'|'foundry'|'fc5', at: ISO date, ed, name, classes: [{cls, lvl, subName}], ab: [6], hp, ac, speed, init, saves: [], skills: {prof: [], exp: []}, passive: {prc, inv, ins}, resist: [], immune: [], species, background, feats: [names], spells: [{n, lvl, cls, p}], items: [{n, qty, eq, att}]}`.
+A tool that can use it (spells, feats, items, the planner) checks `ch.imp` on load and in `onChange`: when `imp.at` is newer than the `impAt` it saved in its own `links[repo]`, it offers "Use the spells/feats/items imported from D&D Beyond" (never overwrites silently), then saves `impAt`. Match names case-insensitively against your own data and list anything it couldn't match. The importer also publishes `sheet.import` (ac, speed, init, passive, resist, immune, skills) for the Character Sheet.
+
 ## 7. Checks before pushing
 - At 375 px and at desktop width, in light and dark, `index.html` and `changes.html` show no horizontal scroll and no console errors.
 - Every footer link resolves. The theme carries across sites.
@@ -118,6 +131,7 @@ Unknown fields are ignored, so a tool can add more later; tell the hub session s
 - Sites that are already live are pushed without asking again. Only a new public repo needs Chris's yes.
 
 ## Revisions
+- v1.10 (2026-11-19): `shared/sources.js` and the source picker rule (6f: core books first and on by default, partner books listed but off); `character.js` v1.6 keeps `imp`, the imported-character summary (6g).
 - v1.9.1 (2026-11-18): `character.js` v1.5: opening a share link for a character you already have (same classes and scores) now takes its newer sheet summaries instead of ignoring them.
 - v1.9 (2026-11-18): `character.js` v1.4 adds `sheet` / `setSheet` (section 6e) for the new Character Sheet and Party pages; sheet summaries travel in share links (`s`).
 - v1.8 (2026-11-18): motion and charts (section 6d): vendored Motion 14.9.0, `ui.js` (reveal, spotlight, enter/pop/count) and `chart.js` (`DndPlot` line/bar charts) ported from the Kokonut UI and bklit UI looks to plain JS; `character.js` v1.3 animates the share prompt; `.char-import` no longer centres with transform.

@@ -63,7 +63,7 @@ for site in SITES:
     css = (repo / "site" / "styles.css").read_text(encoding="utf-8")
     blk = shared_block(css)
     (ok if blk == canon_css else bad)(site, f"styles.css shared block matches {canon_ver}" if blk == canon_css else f"styles.css shared block differs from {canon_ver} (found {blk and re.search(r'v[\d.]+', blk).group(0)})")
-    for js in ["theme.js", "version.js", "character.js", "motion.js", "ui.js"] + (["chart.js"] if (repo / "site" / "chart.js").exists() else []):
+    for js in ["theme.js", "version.js", "character.js", "motion.js", "ui.js"] + [j for j in ("chart.js", "sources.js") if (repo / "site" / j).exists()]:
         canon = (HUB / "shared" / js).read_text(encoding="utf-8").replace("\r\n", "\n")
         f = repo / "site" / js
         if not f.exists(): bad(site, f"site/{js} missing"); continue
