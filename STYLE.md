@@ -155,6 +155,7 @@ Each tool site publishes `site/search.json` for the hub's "Search every tool" bo
 - Sites that are already live are pushed without asking again. Only a new public repo needs Chris's yes.
 
 ## Revisions
+- v1.14.1 (2026-11-19): `dice.js` v1.0.1: rolls inside an open modal `<dialog>` show the tray in that dialog (top layer); `data-roll` must contain a die, so a site's own `data-roll="0"` is left alone (better still, use another attribute name).
 - v1.14 (2026-11-19): dice and links between tools (6k: `dice.js`, `links.js`, CSS v1.11, `statblock.js` v1.1) and smoke test v1.2.
 - v1.13.2 (2026-11-19): `nav.js` v1.0.2: Run menu gains Encounter Builder (`dnd-monsters/#encounter`); menu entries with a #hash are marked current only on that view.
 - v1.13.1 (2026-11-19): 6h: no `offline.js` on 404 pages; apps that rewrite the URL keep parameters they don't own (`?sw=1`).
