@@ -52,24 +52,31 @@
   function model(ch) {
     var P = sum(ch, TOOL.planner.repo), M = sum(ch, TOOL.magic.repo), W = sum(ch, TOOL.wild.repo), F = sum(ch, TOOL.feats.repo), I = sum(ch, TOOL.items.repo);
     // the planner's summary is for the full planned build; the shared record's classes are where the character is now
-    var now = C.level(ch), planLvl = int(P && P.lvl, 1, 20), lvl = now || planLvl || 1, ahead = !!(planLvl && now && planLvl > now);
+    // The planner's summary is for the full planned build. When the character is below it, the planner adds
+    // now: {lvl, src, hp, slots, pact?, res?} at the current level. The shared record's classes equal the plan.
+    var N = P && P.now && typeof P.now === 'object' && int(P.now.lvl, 1, 20) ? P.now : null;
+    var recLvl = C.level(ch), planLvl = int(P && P.lvl, 1, 20);
+    var lvl = N ? int(N.lvl, 1, 20) : (recLvl || planLvl || 1), ahead = N ? lvl < (planLvl || 20) : !!(planLvl && recLvl && planLvl > recLvl);
+    var single = ch.classes.length === 1;
     var ab = P && Array.isArray(P.ab) && P.ab.length === 6 && P.ab.every(function (n) { return num(n) != null; }) ? P.ab.map(function (n) { return int(n, 1, 30); }) : ch.ab;
     var m = {
-      ch: ch, P: P, M: M, W: W, F: F, I: I, lvl: lvl, planLvl: planLvl, ahead: ahead,
+      ch: ch, P: P, M: M, W: W, F: F, I: I, lvl: lvl, planLvl: planLvl, ahead: ahead, N: N, single: single,
       pb: (!ahead && int(P && P.pb, 2, 6)) || Math.ceil(lvl / 4) + 1, pbGuess: ahead || !(P && num(P.pb)),
       ab: ab, abFromPlanner: ab !== ch.ab,
       mod: function (a) { return Math.floor((ab[ABIL.indexOf(a)] - 10) / 2); },
       saves: arr(P && P.saves).map(function (s) { return String(s).toLowerCase().slice(0, 3); }),
-      hp: ahead ? null : int(P && P.hp, 1, 999), planHp: int(P && P.hp, 1, 999),
-      hd: ahead || !(P && P.hd) ? hdFromClasses(ch) : parseHD(P.hd),
-      slots: Array.isArray(P && P.slots) ? P.slots.slice(0, 9).map(function (n) { return int(n, 0, 9) || 0; }) : [],
-      pact: P && P.pact && typeof P.pact === 'object' ? { n: int(P.pact.n, 0, 9) || 0, lvl: int(P.pact.lvl, 1, 9) || 1 } : null,
+      hp: N ? int(N.hp, 1, 999) : ahead ? null : int(P && P.hp, 1, 999), planHp: int(P && P.hp, 1, 999),
+      hd: N ? (N.hd ? parseHD(N.hd) : single ? hdFromClasses(ch, lvl) : []) : ahead || !(P && P.hd) ? hdFromClasses(ch) : parseHD(P.hd),
+      hdUnknown: !!(N && !N.hd && !single),
+      slots: slotsOf(N ? N.slots : P && P.slots),
+      pact: pactOf(N ? N.pact : P && P.pact),
       dc: arr(P && P.dc).filter(function (d) { return d && typeof d === 'object'; }).slice(0, 6),
       dcAhead: ahead,
       attacks: int(P && P.attacks, 1, 8),
-      res: arr(P && P.res).filter(function (r) { return r && r.name; }).slice(0, 40).map(function (r) { var per = PER[r.per] ? r.per : 'long'; return { name: str(r.name, 60), max: per === 'turn' ? 0 : (int(r.max, 0, 99) || 0), per: per, note: str(r.note, 120) }; }),   // per-turn (Sneak Attack) and unlimited pools get no pips
+      res: arr(N ? N.res : P && P.res).filter(function (r) { return r && r.name; }).slice(0, 40).map(function (r) { var per = PER[r.per] ? r.per : 'long'; return { name: str(r.name, 60), max: per === 'turn' ? 0 : (int(r.max, 0, 99) || 0), per: per, note: str(r.note, 120) }; }),   // per-turn (Sneak Attack) and unlimited pools get no pips
       ws: parseUses(W && W.uses),
       ed: ch.ed,
+      skills: P && P.skills && typeof P.skills === 'object' ? P.skills : firstField(ch, 'skills'),
       ac: num(firstField(ch, 'ac')), speed: firstField(ch, 'speed'), init: num(firstField(ch, 'init')), passive: firstField(ch, 'passive'),
       resist: firstField(ch, 'resist'), immune: firstField(ch, 'immune')
     };
@@ -78,14 +85,21 @@
     m.druid = C.levelIn(ch, 'druid') > 0 || !!W;
     return m;
   }
-  function hdFromClasses(ch) {   // hit dice from the shared record's classes (the character's current levels)
-    var by = {}; ch.classes.forEach(function (x) { var d = HD[x.cls] || 8; by[d] = (by[d] || 0) + x.lvl; });
+  function slotsOf(a) { return Array.isArray(a) ? a.slice(0, 9).map(function (n) { return int(n, 0, 9) || 0; }) : []; }
+  function pactOf(o) { return o && typeof o === 'object' ? { n: int(o.n, 0, 9) || 0, lvl: int(o.lvl, 1, 9) || 1 } : null; }
+  function hdFromClasses(ch, only) {   // hit dice from the shared record's classes; `only` = level of a single-class character
+    var by = {}; ch.classes.forEach(function (x) { var d = HD[x.cls] || 8; by[d] = (by[d] || 0) + (only || x.lvl); });
     return Object.keys(by).map(Number).sort(function (a, b) { return b - a; }).map(function (d) { return { n: Math.min(20, by[d]), d: d }; });
   }
   function parseUses(u) {   // Wild Shape publishes a display string: "3 / long rest", "2 / short rest", "Unlimited" (or a plain number)
     if (u == null || u === '') return null;
     var t = str(u, 40), unl = /unlimited/i.test(t), n = int((/\d+/.exec(t) || [])[0], 0, 20);
     return { label: typeof u === 'number' ? '' : t, n: unl ? 0 : (n || 0), unl: unl, per: /short/i.test(t) ? 'short' : /long/i.test(t) ? 'long' : null };
+  }
+  function passiveFrom(m, skill, abil) {
+    var sk = m.skills; if (!sk) return null;
+    var has = function (list) { return arr(list).some(function (x) { return String(x).toLowerCase().indexOf(skill) === 0; }); };
+    return 10 + m.mod(abil) + (has(sk.exp) ? 2 * m.pb : has(sk.prof) ? m.pb : 0);
   }
   function parseHD(s) {   // "3d12+5d8" -> [{n:3, d:12}, {n:5, d:8}]
     var out = []; String(s || '').replace(/(\d+)\s*d\s*(\d+)/gi, function (_, n, d) { n = int(n, 0, 20); d = int(d, 4, 12); if (n && d) out.push({ n: n, d: d }); return ''; });
@@ -148,10 +162,15 @@
       m.ac != null ? ['AC', m.ac] : null,
       ['Initiative', sign(m.init != null ? m.init : m.mod('dex'))],
       m.speed != null ? ['Speed', esc(str(m.speed, 20))] : null,
-      pv && num(pv.prc) != null ? ['Passive Perception', num(pv.prc)] : ['Passive Wisdom', wisP, 'Passive Perception before any proficiency: 10 + Wisdom modifier'],
+      m.skills ? ['Passive Perception', passiveFrom(m, 'percep', 'wis')] : pv && num(pv.prc) != null ? ['Passive Perception', num(pv.prc)] : ['Passive Wisdom', wisP, 'Passive Perception before any proficiency: 10 + Wisdom modifier'],
+      m.skills ? ['Passive Insight', passiveFrom(m, 'insight', 'wis')] : pv && num(pv.ins) != null ? ['Passive Insight', num(pv.ins)] : null,
+      m.skills ? ['Passive Investigation', passiveFrom(m, 'investig', 'int')] : pv && num(pv.inv) != null ? ['Passive Investigation', num(pv.inv)] : null,
       m.attacks ? ['Attacks', m.attacks + ' per action'] : null
     ].filter(Boolean);
-    var lvlNote = m.ahead ? '<p class="sh-note warn">The Multiclass Planner build goes to level ' + m.planLvl + '; the character is level ' + m.lvl + ' now. Level, proficiency, hit dice, features and feats here follow level ' + m.lvl + '. Slots and resources are from the level ' + m.planLvl + ' plan, and max HP needs setting by hand.</p>'
+    var srcTxt = m.N ? (m.N.src === 'import' ? ' (from the imported character)' : m.N.src === 'at' ? ' (the planner\'s "At level" setting)' : '') : '';
+    var lvlNote = m.N && m.ahead ? '<p class="sh-note">The Multiclass Planner build goes to level ' + m.planLvl + '; this sheet shows level ' + m.lvl + srcTxt + '.' +
+        (m.single ? '' : ' Features and feats are filtered by total level only' + (m.hdUnknown ? ', and hit dice per class aren\'t known yet' : '') + '.') + '</p>'
+      : m.ahead ? '<p class="sh-note warn">The Multiclass Planner build goes to level ' + m.planLvl + '; the character is level ' + m.lvl + ' now. Level, proficiency, hit dice, features and feats here follow level ' + m.lvl + '. Slots and resources are from the level ' + m.planLvl + ' plan, and max HP needs setting by hand.</p>'
       : m.planLvl && m.planLvl < m.lvl ? '<p class="sh-note">The Multiclass Planner build stops at level ' + m.planLvl + '; the character is level ' + m.lvl + '.</p>' : '';
     return '<section class="sh-top" aria-labelledby="shName">' +
       '<div class="sh-id"><h2 id="shName">' + esc(ch.name) + '</h2>' +
@@ -171,6 +190,7 @@
       '<button type="button" class="btn" data-a="temp" data-k="temp" title="Temporary hit points don\'t stack: this replaces them">Temp HP</button></div>';
     if (!m.hp) h += '<div class="sh-ctl hp-setmax"><label>Max HP <input id="hpMax" type="number" inputmode="numeric" min="1" max="999" value="' + (p.max || '') + '"></label>' +
       (m.ahead && m.planHp ? '<span class="muted small">The plan\'s ' + m.planHp + ' HP is for level ' + m.planLvl + '.</span>' : m.P ? '<span class="muted small">The planner has no HP for this character.</span>' : '') + '</div>';
+    if (m.hdUnknown) h += '<p class="sh-note">Hit dice at level ' + m.lvl + ' aren\'t known for this multiclass build.</p>';
     if (m.hd.length) {
       var con = m.mod('con');
       h += '<div class="sh-row"><span class="sh-lbl">Hit dice <span class="muted">(' + sign(con) + ' Con each)</span></span><span class="sh-pipset">' +
@@ -222,7 +242,7 @@
     var any = false, rows = '';
     m.slots.forEach(function (n, i) { if (!n) return; any = true; var used = Math.min(p.slots[i], n); rows += '<div class="slot"><span class="slot-l">' + ORD[i + 1].replace(' level', '') + '</span>' + pips('slot:' + i, n, n - used, ORD[i + 1] + ' slots') + '<span class="slot-c">' + (n - used) + '/' + n + '</span></div>'; });
     if (m.pact) { any = true; var pu = Math.min(p.pact, m.pact.n); rows += '<div class="slot pact"><span class="slot-l">Pact (' + ORD[m.pact.lvl].replace(' level', '') + ')</span>' + pips('pact', m.pact.n, m.pact.n - pu, 'Pact slots') + '<span class="slot-c">' + (m.pact.n - pu) + '/' + m.pact.n + '</span></div>'; }
-    if (any) h += '<div class="slots"><h4>Spell slots' + (m.ahead ? ' <span class="warn">(level ' + m.planLvl + ' plan)</span>' : '') + '</h4>' + rows + (m.pact ? '<p class="sh-note">Pact slots come back on a short rest.</p>' : '') + '</div>';
+    if (any) h += '<div class="slots"><h4>Spell slots' + (m.ahead && !m.N ? ' <span class="warn">(level ' + m.planLvl + ' plan)</span>' : '') + '</h4>' + rows + (m.pact ? '<p class="sh-note">Pact slots come back on a short rest.</p>' : '') + '</div>';
     var links = m.P ? src(m, 'planner') : '';
     if (!m.P) h += missing(m, 'planner', 'slots and spell save DCs');
     // spells
@@ -305,7 +325,7 @@
       var by = {}, order = [];
       var later = 0;
       arr(P.features).forEach(function (f) {
-        if (!f || !f.name) return; var c = str(f.cls, 30).toLowerCase() || 'other', have = C.levelIn(m.ch, c);
+        if (!f || !f.name) return; var c = str(f.cls, 30).toLowerCase() || 'other', have = m.N ? m.lvl : C.levelIn(m.ch, c);   // with now{}: class levels unknown for multiclass, so total level is the cap
         if (have && int(f.lvl, 1, 20) > have) { later++; return; }   // planned for a later level of that class
         if (!by[c]) { by[c] = []; order.push(c); } by[c].push(f);
       });

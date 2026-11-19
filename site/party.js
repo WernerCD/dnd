@@ -23,8 +23,17 @@
   // XP needed to reach each level (SRD 5.1 / 5.2 Character Advancement; the same in both editions). XP[lvl - 1].
   var XP = [0, 300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 64000, 85000, 100000, 120000, 140000, 165000, 195000, 225000, 265000, 305000, 355000];
   // the planner summary is for the full planned build; the shared record says where the character is now
-  function levelOf(ch) { var P = sum(ch, REPOS.planner); return C.level(ch) || int(P && P.lvl, 1, 20) || 1; }
-  function maxHp(ch) { var P = sum(ch, REPOS.planner), p = play(ch.id) || {}, pl = int(P && P.lvl, 1, 20), ahead = pl && C.level(ch) && pl > C.level(ch); return (!ahead && int(P && P.hp, 1, 999)) || int(p.max, 1, 999) || null; }
+  function nowOf(ch) { var P = sum(ch, REPOS.planner); return P && P.now && typeof P.now === 'object' && int(P.now.lvl, 1, 20) ? P.now : null; }   // planner at the current level
+  function levelOf(ch) { var P = sum(ch, REPOS.planner), N = nowOf(ch); return (N && int(N.lvl, 1, 20)) || C.level(ch) || int(P && P.lvl, 1, 20) || 1; }
+  function maxHp(ch) {
+    var P = sum(ch, REPOS.planner), N = nowOf(ch), p = play(ch.id) || {}, pl = int(P && P.lvl, 1, 20), ahead = !N && pl && C.level(ch) && pl > C.level(ch);
+    return (N ? int(N.hp, 1, 999) : !ahead && int(P && P.hp, 1, 999)) || int(p.max, 1, 999) || null;
+  }
+  function passivePrc(ch) {   // from the planner's (or importer's) skills: 10 + Wis + proficiency (doubled with expertise)
+    var P = sum(ch, REPOS.planner), sk = (P && P.skills) || field(ch, 'skills'); if (!sk || typeof sk !== 'object') return null;
+    var lvl = levelOf(ch), pb = Math.ceil(lvl / 4) + 1, has = function (l) { return arr(l).some(function (x) { return String(x).toLowerCase().indexOf('percep') === 0; }); };
+    return 10 + wisMod(ch) + (has(sk.exp) ? 2 * pb : has(sk.prof) ? pb : 0);
+  }
   var DndParty = {
     XP: XP,
     xpFor: function (lvl) { return XP[(int(lvl, 1, 20) || 1) - 1]; },
@@ -46,6 +55,7 @@
 
   function sum(ch, repo) { var s = ch && ch.sheet && ch.sheet[repo]; return s && typeof s === 'object' && !Array.isArray(s) ? s : null; }
   function field(ch, f) { var o = ch.sheet || {}; var order = [REPOS.planner, REPOS.feats, REPOS.items, REPOS.magic, REPOS.wild]; for (var k in o) if (order.indexOf(k) < 0) order.push(k); for (var i = 0; i < order.length; i++) { var s = sum(ch, order[i]); if (s && s[f] != null) return s[f]; } return null; }
+  function abMod(ch, i) { var P = sum(ch, REPOS.planner), ab = P && Array.isArray(P.ab) && P.ab.length === 6 ? P.ab : ch.ab; return Math.floor(((int(ab[i], 1, 30) || 10) - 10) / 2); }
   function wisMod(ch) { var P = sum(ch, REPOS.planner), ab = P && Array.isArray(P.ab) && P.ab.length === 6 ? P.ab : ch.ab; return Math.floor(((int(ab[4], 1, 30) || 10) - 10) / 2); }
   function spells(ch) { var M = sum(ch, REPOS.magic); return arr(M && M.spells).filter(function (s) { return s && s.n; }).map(function (s) { return str(s.n, 80); }); }
   function key(n) { return String(n).toLowerCase().replace(/^[a-z]+['’]s\s+/, '').replace(/[^a-z ]+/g, '').replace(/\s+/g, ' ').trim(); }   // "Leomund's Tiny Hut" -> "tiny hut"
@@ -100,8 +110,9 @@
     var P = sum(ch, REPOS.planner), p = play(ch.id) || {};
     var lvl = levelOf(ch), max = maxHp(ch);
     var cur = p.hp == null ? max : int(p.hp, 0, 999); if (max && cur != null) cur = Math.min(cur, max);
-    var ac = num(field(ch, 'ac')), pv = field(ch, 'passive'), prc = pv && typeof pv === 'object' ? num(pv.prc) : null;
-    var dcs = arr(P && P.dc).map(function (d) { return d && int(d.dc, 1, 40); }).filter(Boolean);
+    var ac = num(field(ch, 'ac')), pv = field(ch, 'passive'), prc = passivePrc(ch); if (prc == null && pv && typeof pv === 'object') prc = num(pv.prc);
+    var below = lvl < (int(P && P.lvl, 1, 20) || 0), pbNow = Math.ceil(lvl / 4) + 1;   // plan ahead: 8 + current proficiency + modifier
+    var dcs = arr(P && P.dc).map(function (d) { if (!d) return null; var i = ['str', 'dex', 'con', 'int', 'wis', 'cha'].indexOf(String(d.abil || '').toLowerCase().slice(0, 3)); return below && i >= 0 ? 8 + pbNow + abMod(ch, i) : int(d.dc, 1, 40); }).filter(Boolean);
     var stats = [
       ['Level', lvl], ['HP', max ? (cur != null && cur !== max ? cur + '/' + max : max) + (int(p.temp, 0, 999) ? ' +' + int(p.temp, 0, 999) : '') : '?'],
       ['AC', ac != null ? ac : '?'],
