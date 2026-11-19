@@ -127,12 +127,15 @@ A tool that can use it (spells, feats, items, the planner) checks `ch.imp` on lo
 - At 375 px and at desktop width, in light and dark, `index.html` and `changes.html` show no horizontal scroll and no console errors.
 - Every footer link resolves. The theme carries across sites.
 
+- **Browser smoke tests (v1.12):** copy `shared/smoke_test.py` unchanged to `tools/smoke_test.py` and run it in `pages.yml` after `check_site.py`, before deploying (copy the three steps from the hub's `pages.yml`: setup-python, install Playwright and Chromium, run). A failing test stops the deploy. It checks every page at desktop and phone width: no JS or console errors, no broken same-site requests, header/footer/menu present and working, theme switch, no sideways scroll, nothing hidden with reduced motion, and the shared character save/picker/share-link flow. List extra pages in `tests/smoke.json` and add site checks in `tests/site_test.py` (`def run(page, base, check)`). Run it locally before pushing: `python tools/smoke_test.py` (needs `pip install playwright` and `python -m playwright install chromium`).
+
 ## 8. Sync routine
 - After any change to a site, or to `shared/`, run `python tools/check_sites.py` from the hub repo. It must end with `ALL OK`.
 - A change to `shared/` bumps the version in the CSS block's comments, gets a line under Revisions, and is copied to every site in the same pass.
 - Sites that are already live are pushed without asking again. Only a new public repo needs Chris's yes.
 
 ## Revisions
+- v1.12 (2026-11-19): `shared/smoke_test.py`, a Playwright browser test suite every site runs in CI before deploying (section 7).
 - v1.11.1 (2026-11-19): CSS v1.9.1: under 720 px the top bar wraps to "Toolbox · Tools · Changes" with the character picker on its own row, and the Tools menu stays inside the screen.
 - v1.11 (2026-11-19): `shared/nav.js` and CSS v1.9: centred drop-down menus of every page in the top bar.
 - v1.10 (2026-11-19): `shared/sources.js` and the source picker rule (6f: core books first and on by default, partner books listed but off); `character.js` v1.6 keeps `imp`, the imported-character summary (6g).

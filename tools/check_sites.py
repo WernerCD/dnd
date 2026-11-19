@@ -77,6 +77,10 @@ for site in SITES:
     chk = repo / "tools" / "check_site.py"
     wf = (repo / ".github" / "workflows" / "pages.yml").read_text(encoding="utf-8")
     good = chk.exists() and "check_site.py" in wf
+    sm = repo / "tools" / "smoke_test.py"
+    norm = lambda f: f.read_text(encoding="utf-8").replace(chr(13), "")
+    smok = sm.exists() and norm(sm) == norm(HUB / "shared" / "smoke_test.py") and "smoke_test.py" in wf
+    (ok if smok else bad)(site, "CI runs the shared browser smoke tests" if smok else "tools/smoke_test.py missing/differs from shared, or not run in pages.yml (STYLE 7)")
     (ok if good else bad)(site, "CI runs tools/check_site.py" if good else "tools/check_site.py missing or not run in pages.yml")
     if site != "dnd":
         heads = re.findall(r"^## (.+)$", (repo / "README.md").read_text(encoding="utf-8"), re.M)

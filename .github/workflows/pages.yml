@@ -26,6 +26,13 @@ jobs:
         run: sed -i "s/?v=dev/?v=${GITHUB_SHA::8}/g" site/*.html
       - name: Check site
         run: python tools/check_site.py
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install the browser test runner
+        run: pip install playwright==1.65.2 && python -m playwright install --with-deps chromium
+      - name: Browser smoke tests (STYLE.md 7)
+        run: python tools/smoke_test.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
