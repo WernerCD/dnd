@@ -1,0 +1,26 @@
+{"name":"Tamsin Reed","type":"character","_id":"Zx9Yw8Vu7Ts6Rq5P","_stats":{"systemId":"dnd5e","systemVersion":"3.3.1"},
+ "system":{
+  "abilities":{"str":{"value":8,"proficient":0},"dex":{"value":14,"proficient":0},"con":{"value":13,"proficient":0},"int":{"value":17,"proficient":1},"wis":{"value":12,"proficient":1},"cha":{"value":10,"proficient":0}},
+  "skills":{"arc":{"value":2,"ability":"int"},"his":{"value":1,"ability":"int"},"inv":{"value":1,"ability":"int"},"ste":{"value":0,"ability":"dex"}},
+  "attributes":{"hp":{"value":17,"max":22,"temp":0,"tempmax":0,"bonuses":{"level":"","overall":""}},
+   "ac":{"calc":"mage","flat":null,"formula":""},"init":{"bonus":"2"},
+   "movement":{"walk":null,"burrow":null,"climb":null,"fly":null,"swim":null,"units":"ft","hover":false}},
+  "details":{"race":"High Elf","background":"Sage"},
+  "traits":{"dr":{"value":["fire"],"bypasses":[],"custom":"Psychic (while concentrating)"},"di":{"value":[],"custom":""},"ci":{"value":["charmed"],"custom":""}}
+ },
+ "items":[
+  {"name":"Wizard","type":"class","system":{"identifier":"wizard","levels":5,"hitDice":"d6","hitDiceUsed":1,"source":{"book":"PHB"},"advancement":[{"type":"HitPoints","value":{"1":"max","2":"avg","3":"avg","4":2,"5":"avg"}}]}},
+  {"name":"School of Evocation","type":"subclass","system":{"identifier":"evocation","classIdentifier":"wizard"}},
+  {"name":"Elf","type":"race","system":{"movement":{"walk":30,"units":"ft"}}},
+  {"name":"Alert","type":"feat","system":{"type":{"value":"feat"}}},
+  {"name":"Arcane Recovery","type":"feat","system":{"type":{"value":"class"}}},
+  {"name":"Fire Bolt","type":"spell","system":{"level":0,"preparation":{"mode":"prepared","prepared":false},"sourceClass":"wizard"}},
+  {"name":"Shield","type":"spell","system":{"level":1,"preparation":{"mode":"prepared","prepared":true}}},
+  {"name":"Mage Armor","type":"spell","system":{"level":1,"preparation":{"mode":"prepared","prepared":true}}},
+  {"name":"Fireball","type":"spell","system":{"level":3,"preparation":{"mode":"prepared","prepared":true}}},
+  {"name":"Feather Fall","type":"spell","system":{"level":1,"preparation":{"mode":"prepared","prepared":false}}},
+  {"name":"Ring of Protection","type":"equipment","system":{"quantity":1,"equipped":true,"attunement":"required","attuned":true,"armor":{"value":null}}},
+  {"name":"Spellbook","type":"loot","system":{"quantity":1}},
+  {"name":"Old Wand","type":"equipment","system":{"quantity":1,"equipped":false,"attunement":2}}
+ ],
+ "effects":[]}

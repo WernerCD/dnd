@@ -1,0 +1,30 @@
+{"name":"Moss","type":"character","_id":"aB3dE5fG7hJ9kL1m",
+ "system":{
+  "abilities":{"str":{"value":8,"proficient":0},"dex":{"value":14,"proficient":0},"con":{"value":14,"proficient":0},"int":{"value":12,"proficient":1},"wis":{"value":17,"proficient":1},"cha":{"value":10,"proficient":0}},
+  "attributes":{"hp":{"value":20,"max":null,"temp":0,"bonuses":{"level":"","overall":""}},"ac":{"calc":"default","flat":null,"bonus":""},
+   "init":{"ability":"","bonus":""},"movement":{"walk":30,"swim":0,"fly":0,"climb":0,"burrow":0,"units":"ft","hover":false}},
+  "details":{"originalClass":"cls00000000001","race":"rac00000000000001","background":"bkg0000000000001","biography":{"value":"<p>Long biography text.</p>"}},
+  "skills":{"nat":{"value":1,"ability":"int"},"prc":{"value":1,"ability":"wis"},"med":{"value":2,"ability":"wis"},"ins":{"value":0,"ability":"wis"},"ani":{"value":0.5,"ability":"wis"}},
+  "traits":{"dr":{"value":["poison"],"custom":""},"di":{"value":[],"custom":""},"ci":{"value":[],"custom":"frightened"}}
+ },
+ "items":[
+  {"_id":"cls00000000001","name":"Druid","type":"class","system":{"identifier":"druid","levels":4,"hd":{"denomination":"d8","spent":0},"source":{"book":"XPHB","rules":"2024"},
+    "advancement":[{"type":"HitPoints","value":{"1":"max","2":"avg","3":6,"4":"avg"}}],"description":{"value":"text"}}},
+  {"_id":"sub00000000001","name":"Circle of the Moon","type":"subclass","system":{"identifier":"moon","classIdentifier":"druid","source":{"rules":"2024"}}},
+  {"_id":"rac00000000000001","name":"Wood Elf","type":"race","system":{"source":{"rules":"2024"}}},
+  {"_id":"bkg0000000000001","name":"Guide","type":"background","system":{"source":{"rules":"2024"}}},
+  {"name":"Magic Initiate (Druid)","type":"feat","system":{"type":{"value":"feat"}}},
+  {"name":"Wild Shape","type":"feat","system":{"type":{"value":"class"}}},
+  {"name":"Leather Armor","type":"equipment","system":{"type":{"value":"light"},"armor":{"value":11,"dex":null},"equipped":true,"quantity":1}},
+  {"name":"Shield","type":"equipment","system":{"type":{"value":"shield"},"armor":{"value":2},"equipped":true,"quantity":1}},
+  {"name":"Quarterstaff","type":"weapon","system":{"equipped":true,"quantity":1}},
+  {"name":"Amulet of Health","type":"equipment","system":{"type":{"value":"trinket"},"armor":{"value":null},"equipped":false,"attunement":"required","attuned":false,"quantity":1}},
+  {"name":"Herbalism Kit","type":"tool","system":{"quantity":1}},
+  {"name":"Druidcraft","type":"spell","system":{"level":0,"method":"spell","prepared":0,"sourceClass":"druid"}},
+  {"name":"Goodberry","type":"spell","system":{"level":1,"method":"spell","prepared":1,"sourceClass":"druid"}},
+  {"name":"Thunderwave","type":"spell","system":{"level":1,"method":"spell","prepared":0,"sourceClass":"druid"}},
+  {"name":"Moonbeam","type":"spell","system":{"level":2,"method":"spell","prepared":2,"sourceClass":"druid"}},
+  {"name":"Speak with Animals","type":"spell","system":{"level":1,"preparation":{"mode":"always","prepared":false}}}
+ ],
+ "effects":[], "_stats":{"systemId":"dnd5e","systemVersion":"5.1.2"}
+}

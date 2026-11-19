@@ -54,6 +54,20 @@
   <section class="group" id="build" aria-labelledby="buildH">
     <div class="group-head"><h2 id="buildH">Build a character</h2><p>Plan levels, spells and feats before the session.</p></div>
     <div class="tools" data-reveal>
+    <div class="tool char-card" id="characters" data-spot>
+      <span class="ico"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 15a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11zM5 29c0-6.5 5-11 11-11s11 4.5 11 11z"/></svg></span>
+      <h3>Characters</h3>
+      <p class="cc-stat" id="ccStat">Every tool shares your characters.</p>
+      <form class="cc-form" id="newChar" aria-label="Quick character">
+        <label class="cc-name">Name <input id="ncName" maxlength="60" autocomplete="off" placeholder="Aric"></label>
+        <label>Rules <select id="ncEd"><option value="2024">2024</option><option value="2014">2014</option></select></label>
+        <label>Class <select id="ncClass"></select></label>
+        <label>Level <input id="ncLvl" type="number" inputmode="numeric" min="1" max="20" value="1"></label>
+        <button class="btn primary" type="submit">Add</button>
+      </form>
+      <p class="cc-msg" id="ccMsg" role="status" aria-live="polite"></p>
+      <a class="go" href="characters.html">Open Characters: edit, share, import &rarr;</a>
+    </div>
     <a class="tool" data-spot href="https://wernercd.github.io/dnd-multiclass-planner/">
       <span class="ico"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3l3.5 8.5L28 13l-6.5 6 1.8 9L16 23.5 8.7 28l1.8-9L4 13l8.5-1.5z"/></svg></span>
       <h3>Multiclass Planner</h3>
@@ -132,29 +146,6 @@
     </div>
   </section>
 
-  <section class="chars" id="characters" aria-labelledby="charsH">
-    <h2 id="charsH">Characters</h2>
-    <p class="intro">Your characters are shared by every tool. A Paladin built in the Multiclass Planner opens in the Spell Planner with its Paladin spell list, level and spellcasting modifier already set. A druid's level and circle carry over to Wild Shape. Characters are stored only in this browser. Use a character's Share link to send it to another device or to another player, or Export to back them all up.</p>
-    <ul class="char-list" id="charList" data-reveal></ul>
-    <form class="new-char" id="newChar">
-      <h3>Quick character</h3>
-      <div class="nc-row">
-        <label>Name <input id="ncName" maxlength="60" placeholder="Aric"></label>
-        <label>Rules <select id="ncEd"><option value="2024">2024</option><option value="2014">2014</option></select></label>
-        <label>Class <select id="ncClass"></select></label>
-        <label>Level <input id="ncLvl" type="number" min="1" max="20" value="1"></label>
-        <label>Subclass <input id="ncSub" maxlength="80" placeholder="optional"></label>
-        <button class="btn primary" type="submit">Add</button>
-      </div>
-      <p class="muted small">For multiclass builds, ability scores and level-by-level plans, use the <a href="https://wernercd.github.io/dnd-multiclass-planner/">Multiclass Planner</a>. Its saved builds appear here.</p>
-    </form>
-    <div class="char-io">
-      <button class="btn" type="button" id="charExport">Export characters</button>
-      <button class="btn" type="button" id="charImportBtn">Import</button>
-      <input type="file" id="charImport" accept="application/json,.json" hidden>
-      <span id="charMsg" class="muted small" role="status"></span>
-    </div>
-  </section>
 
 </main>
 <footer class="site-footer">

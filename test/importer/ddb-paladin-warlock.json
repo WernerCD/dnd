@@ -1,0 +1,41 @@
+{"id":90000001,"success":true,"message":"Character successfully received.","data":{
+ "id":90000001,"name":"Brin Ashvale","readonlyUrl":"https://www.dndbeyond.com/characters/90000001",
+ "stats":[{"id":1,"value":15},{"id":2,"value":10},{"id":3,"value":14},{"id":4,"value":8},{"id":5,"value":10},{"id":6,"value":15}],
+ "bonusStats":[{"id":1,"value":null},{"id":2,"value":null},{"id":3,"value":null},{"id":4,"value":null},{"id":5,"value":null},{"id":6,"value":null}],
+ "overrideStats":[{"id":1,"value":null},{"id":2,"value":null},{"id":3,"value":null},{"id":4,"value":null},{"id":5,"value":null},{"id":6,"value":null}],
+ "baseHitPoints":51,"bonusHitPoints":null,"overrideHitPoints":null,"removedHitPoints":7,"temporaryHitPoints":0,
+ "race":{"fullName":"Aasimar","baseRaceName":"Aasimar","sources":[{"sourceId":145}],"weightSpeeds":{"normal":{"walk":30,"fly":0,"burrow":0,"swim":0,"climb":0}}},
+ "background":{"hasCustomBackground":false,"definition":{"name":"Soldier","sources":[{"sourceId":145}],"description":"<p>Long text that must not be imported.</p>"}},
+ "classes":[
+  {"id":1001,"level":5,"isStartingClass":true,"definition":{"name":"Paladin","hitDice":10,"sources":[{"sourceId":145}],"description":"<p>Class description text.</p>"},"subclassDefinition":{"name":"Oath of Devotion","description":"x"}},
+  {"id":1002,"level":2,"isStartingClass":false,"definition":{"name":"Warlock","hitDice":8,"sources":[{"sourceId":145}]},"subclassDefinition":null}],
+ "feats":[{"definition":{"name":"Alert","description":"Feat text"}},{"definition":{"name":"Great Weapon Master","description":"Feat text"}}],
+ "modifiers":{
+  "race":[{"type":"resistance","subType":"necrotic"},{"type":"resistance","subType":"radiant"}],
+  "background":[{"type":"bonus","subType":"strength-score","value":2},{"type":"bonus","subType":"constitution-score","value":1},{"type":"proficiency","subType":"athletics"},{"type":"proficiency","subType":"intimidation"}],
+  "class":[{"type":"proficiency","subType":"wisdom-saving-throws"},{"type":"proficiency","subType":"charisma-saving-throws"},{"type":"proficiency","subType":"insight"},{"type":"proficiency","subType":"persuasion"},{"type":"bonus","subType":"armored-armor-class","value":1}],
+  "feat":[{"type":"bonus","subType":"initiative","value":null},{"type":"bonus","subType":"charisma-score","value":1},{"type":"bonus","subType":"strength-score","value":1}],
+  "item":[{"type":"bonus","subType":"armor-class","value":1,"componentId":5005},{"type":"set","subType":"strength-score","value":21,"componentId":5006}],
+  "condition":[]},
+ "inventory":[
+  {"id":1,"quantity":1,"equipped":true,"isAttuned":false,"definition":{"id":5001,"name":"Chain Mail","filterType":"Armor","armorTypeId":3,"armorClass":16,"canAttune":false,"description":"text"}},
+  {"id":2,"quantity":1,"equipped":true,"isAttuned":false,"definition":{"id":5002,"name":"Shield","filterType":"Armor","armorTypeId":4,"armorClass":2,"canAttune":false}},
+  {"id":3,"quantity":1,"equipped":true,"isAttuned":false,"definition":{"id":5003,"name":"Longsword","filterType":"Weapon","canAttune":false}},
+  {"id":4,"quantity":2,"equipped":false,"isAttuned":false,"definition":{"id":5004,"name":"Potion of Healing","filterType":"Potion","canAttune":false}},
+  {"id":5,"quantity":1,"equipped":true,"isAttuned":true,"definition":{"id":5005,"name":"Cloak of Protection","filterType":"Wondrous item","canAttune":true}},
+  {"id":6,"quantity":1,"equipped":false,"isAttuned":false,"definition":{"id":5006,"name":"Belt of Hill Giant Strength","filterType":"Wondrous item","canAttune":true}},
+  {"id":7,"quantity":10,"equipped":false,"isAttuned":false,"definition":{"id":5007,"name":"Rations","filterType":"Other Gear"}}],
+ "classSpells":[
+  {"characterClassId":1001,"spells":[
+    {"prepared":true,"alwaysPrepared":false,"definition":{"name":"Bless","level":1,"description":"spell text"}},
+    {"prepared":true,"alwaysPrepared":false,"definition":{"name":"Cure Wounds","level":1}},
+    {"prepared":false,"alwaysPrepared":false,"definition":{"name":"Command","level":1}},
+    {"prepared":false,"alwaysPrepared":true,"definition":{"name":"Protection from Evil and Good","level":1}},
+    {"prepared":false,"alwaysPrepared":true,"definition":{"name":"Lesser Restoration","level":2}}]},
+  {"characterClassId":1002,"spells":[
+    {"prepared":false,"alwaysPrepared":false,"definition":{"name":"Eldritch Blast","level":0}},
+    {"prepared":false,"alwaysPrepared":false,"definition":{"name":"Hex","level":1}},
+    {"prepared":false,"alwaysPrepared":false,"definition":{"name":"Armor of Agathys","level":1}}]}],
+ "spells":{"race":[{"definition":{"name":"Light","level":0}}],"class":[],"feat":[],"item":[]},
+ "characterValues":[]
+}}

@@ -90,35 +90,27 @@ a.tool:hover, a.tool:focus-visible { transform: translateY(-2px); border-color: 
 .tool.soon { border-style: dashed; box-shadow: none; }
 .tool.soon .go { color: var(--muted); font-weight: 500; }
 
-/* characters */
-.chars { margin: 40px 0 40px; }
-.chars > h2 { font-size: 1.5rem; margin-bottom: 6px; }
-.chars .intro { color: var(--ink-2); max-width: 780px; margin: 0 0 16px; }
-.char-list { list-style: none; padding: 0; margin: 0 0 18px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
-.char { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
-.char.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
-.char-head { display: flex; align-items: center; gap: 8px; }
-.char-head h3 { font-size: 1.15rem; margin: 0; }
-.char .tag { font-size: .75rem; font-weight: 600; color: var(--accent-ink); background: var(--accent); border-radius: 999px; padding: 1px 8px; }
-.char-sum { margin: 0; color: var(--ink-2); font-size: .92rem; }
-.char-tools, .char-acts, .char-io { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
-.char-list .empty { color: var(--muted); padding: 8px 0; }
+/* hub Characters card (the full page is characters.html + characters.css) */
+.char-card { border-color: var(--accent); }
+.char-card .cc-stat { margin: 0; font-size: .92rem; color: var(--ink-2); }
+.char-card .cc-stat b { color: var(--ink); }
+.cc-form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; margin: 0; }
+.cc-form label { display: flex; flex-direction: column; gap: 2px; font-size: .78rem; color: var(--muted); min-width: 0; }
+.cc-form .cc-name { grid-column: 1 / -1; }
+.cc-form input, .cc-form select { font: inherit; font-size: .92rem; color: var(--ink); background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; min-height: 34px; width: 100%; }
+.cc-form .btn { justify-content: center; min-height: 34px; align-self: end; }
+.cc-msg { margin: 0; font-size: .85rem; color: var(--accent); min-height: 1.3em; }
+.char-card .go { text-decoration: none; }
+.char-card .go:hover, .char-card .go:focus-visible { text-decoration: underline; }
 .btn { display: inline-flex; align-items: center; min-height: 32px; padding: 4px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-2); color: var(--ink); font: inherit; font-size: .9rem; text-decoration: none; cursor: pointer; }
 .btn:hover, .btn:focus-visible { border-color: var(--accent); color: var(--accent); }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .btn.primary:hover, .btn.primary:focus-visible { color: var(--accent-ink); filter: brightness(1.08); }
 button.link { background: none; border: 0; padding: 2px 0; min-height: 24px; color: var(--accent); font: inherit; font-size: .88rem; cursor: pointer; text-decoration: underline; }
 button.link.danger { color: var(--warn); }
-.new-char { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; }
-.new-char h3 { font-size: 1.05rem; margin: 0 0 10px; }
-.nc-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
-.nc-row label { display: flex; flex-direction: column; gap: 3px; font-size: .82rem; color: var(--muted); }
-.nc-row input, .nc-row select { font: inherit; font-size: .92rem; color: var(--ink); background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; min-height: 32px; }
-.nc-row input#ncName, .nc-row input#ncSub { width: 150px; }
-.nc-row input#ncLvl { width: 64px; }
 .muted { color: var(--muted); }
 .small { font-size: .85rem; }
-@media print { .new-char, .char-io, .char-tools, .char-acts, .jump, .tool.soon { display: none !important; } }
+@media print { .cc-form, .cc-msg, .jump, .tool.soon { display: none !important; } }
 
 /* === dnd-shared v1.9.1 (canonical copy: WernerCD/dnd shared/dnd-shared.css) === */
 /* Paste this block unchanged at the END of each site's styles.css. Do not edit it per site;

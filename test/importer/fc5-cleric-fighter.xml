@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pc version="5">
+ <character>
+  <version>38</version>
+  <uid>7F3A9C21-0000-4000-8000-00000000AB12</uid>
+  <name>Tovin Greyhollow</name>
+  <abilities>14,10,13,9,15,11,</abilities>
+  <hpMax>44</hpMax>
+  <hpCurrent>30</hpCurrent>
+  <race>
+   <name>Dwarf, Hill</name>
+   <speed>25</speed>
+   <mod><category>1</category><type>2</type><value>2</value></mod>
+   <mod><category>1</category><type>4</type><value>1</value></mod>
+   <feat><name>Dwarven Resilience</name><text>Long racial text that must not be imported.</text></feat>
+  </race>
+  <background>
+   <name>Acolyte</name>
+   <proficiency>106</proficiency>
+   <proficiency>114</proficiency>
+  </background>
+  <class>
+   <name>Cleric</name>
+   <level>4</level>
+   <hd>2</hd>
+   <proficiency>4</proficiency>
+   <proficiency>5</proficiency>
+   <proficiency>109</proficiency>
+   <proficiency>113</proficiency>
+   <slots>0,4,3,0,0,0,0,0,0,0,</slots>
+   <feat><name>Divine Domain: Life Domain</name><optional>1</optional><text>Subclass text.</text></feat>
+   <feat><name>Life Domain: Disciple of Life</name><optional>1</optional></feat>
+   <feat><name>Ability Score Improvement (4th Level)</name>
+    <mod><name>Ability Score Improvement (4th Level)</name><category>1</category><type>4</type><value>1</value></mod>
+    <mod><name>Ability Score Improvement (4th Level)</name><category>1</category><type>2</type><value>1</value></mod>
+   </feat>
+   <autolevel><feat><name>Spellcasting</name></feat></autolevel>
+   <autolevel><level>8</level><feat><name>Divine Strike</name></feat></autolevel>
+   <spellAbility>4</spellAbility>
+   <spell><name>Sacred Flame</name><school>8</school></spell>
+   <spell><name>Guidance</name><school>2</school></spell>
+   <spell><name>Bless</name><level>1</level><school>5</school><prepared>1</prepared></spell>
+   <spell><name>Cure Wounds</name><level>1</level><school>5</school><prepared>1</prepared></spell>
+   <spell><name>Inflict Wounds</name><level>1</level><school>8</school></spell>
+   <spell><name>Spiritual Weapon</name><level>2</level><school>5</school><prepared>1</prepared></spell>
+  </class>
+  <class>
+   <name>Fighter</name>
+   <hd>3</hd>
+   <feat><name>Fighting Style: Defense</name><optional>1</optional></feat>
+   <feat><name>Second Wind</name></feat>
+  </class>
+  <feat><name>Tough</name><text>Feat text.</text></feat>
+  <item><name>Chain Mail</name><type>3</type><slot>5</slot><ac>16</ac><text>Armor text.</text></item>
+  <item><name>Shield</name><type>4</type><slot>4</slot><ac>2</ac></item>
+  <item><name>Warhammer</name><type>5</type><slot>2</slot></item>
+  <item><name>Potion of Healing</name><type>15</type><quantity>3</quantity></item>
+  <item><name>Periapt of Wound Closure</name><type>14</type><magic>1</magic><detail>wondrous item, uncommon (requires attunement)</detail><slot>1</slot><attuned>1</attuned></item>
+  <container><name>Backpack</name><carried>1</carried><item><name>Torch</name><quantity>10</quantity></item></container>
+ </character>
+ <imageData><uid>7F3A9C21-0000-4000-8000-00000000AB12</uid><encoded>AAAA</encoded></imageData>
+</pc>

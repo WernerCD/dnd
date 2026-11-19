@@ -1,0 +1,12 @@
+{"id":90000002,"name":"Kestrel","stats":[{"id":1,"value":12},{"id":2,"value":15},{"id":3,"value":14},{"id":4,"value":10},{"id":5,"value":13},{"id":6,"value":8}],
+ "bonusStats":[],"overrideStats":[{"id":5,"value":16}],"baseHitPoints":38,"bonusHitPoints":2,"overrideHitPoints":null,
+ "race":{"fullName":"Wood Elf","baseRaceName":"Elf","sources":[{"sourceId":2}],"weightSpeeds":{"normal":{"walk":35}}},
+ "background":{"hasCustomBackground":true,"definition":null,"customBackground":{"name":"Haunted Hunter"}},
+ "classes":[{"id":2001,"level":5,"isStartingClass":true,"definition":{"name":"Blood Hunter","sources":[{"sourceId":75}]},"subclassDefinition":{"name":"Order of the Ghostslayer"}},
+            {"id":2002,"level":1,"isStartingClass":false,"definition":{"name":"Rogue","sources":[{"sourceId":2}]},"subclassDefinition":null}],
+ "feats":[],
+ "modifiers":{"race":[{"type":"bonus","subType":"dexterity-score","value":2},{"type":"proficiency","subType":"perception"}],
+  "class":[{"type":"proficiency","subType":"strength-saving-throws"},{"type":"proficiency","subType":"wisdom-saving-throws"},{"type":"expertise","subType":"stealth"},{"type":"expertise","subType":"perception"},{"type":"proficiency","subType":"sleight-of-hand"}],
+  "background":[],"feat":[],"item":[],"condition":[]},
+ "inventory":[{"quantity":1,"equipped":true,"isAttuned":false,"definition":{"id":1,"name":"Studded Leather","armorTypeId":1,"armorClass":12}}],
+ "classSpells":[],"spells":{}}

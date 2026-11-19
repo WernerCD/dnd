@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Characters · D&amp;D Toolbox</title>
+<meta name="description" content="Make, edit, share and back up the D&amp;D 5e characters every D&amp;D Toolbox tool shares, and import a character from D&amp;D Beyond, Foundry VTT, Fight Club 5 or DiceCloud.">
+<meta name="theme-color" content="#f6f3ec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12171a" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://wernercd.github.io/dnd/characters.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="D&amp;D Toolbox">
+<meta property="og:title" content="Characters · D&amp;D Toolbox">
+<meta property="og:description" content="Make, edit, share and back up the D&amp;D 5e characters every D&amp;D Toolbox tool shares, and import a character from D&amp;D Beyond, Foundry VTT, Fight Club 5 or DiceCloud.">
+<meta property="og:url" content="https://wernercd.github.io/dnd/characters.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 15a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11zM5 29c0-6.5 5-11 11-11s11 4.5 11 11z' fill='%23c9a227'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script>try{var t=localStorage.getItem('dnd.theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
+<link rel="stylesheet" href="styles.css?v=dev">
+<link rel="stylesheet" href="characters.css?v=dev">
+</head>
+<body class="chars-page">
+<header class="site-header">
+  <div class="wrap hub-bar">
+    <a href="./">&larr; D&amp;D Toolbox</a>
+    <span class="char-pick" id="charPick"></span>
+    <nav class="hub-nav" aria-label="Site">
+      <a href="characters.html" aria-current="page">Characters</a>
+      <a href="changes.html">Changes</a>
+    </nav>
+  </div>
+  <div class="wrap header-inner">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 15a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11zM5 29c0-6.5 5-11 11-11s11 4.5 11 11z"/></svg>
+      <div>
+        <h1>Characters</h1>
+        <p class="tagline">One list of characters for every D&amp;D Toolbox tool</p>
+      </div>
+    </div>
+    <button id="themeBtn" class="icon-btn" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="wrap chars-main">
+  <section class="cp-intro">
+    <p>Your characters are shared by every tool. A Paladin built in the Multiclass Planner opens in the Spell Planner with its spell list, level and spellcasting modifier already set, and a druid's level and circle carry over to Wild Shape. Characters are stored only in this browser: use a character's <b>Share link</b> to send it to another device or player, or <b>Export</b> to back them all up.</p>
+    <nav class="jump" aria-label="Sections"><a href="#list">Your characters</a><a href="#edit">New or edit</a><a href="#import">Import</a></nav>
+  </section>
+
+  <section class="cp-sec" id="list" aria-labelledby="listH">
+    <div class="cp-head">
+      <h2 id="listH">Your characters <span class="cp-count" id="charCount"></span></h2>
+      <div class="char-io">
+        <button class="btn" type="button" id="newBtn">New character</button>
+        <button class="btn" type="button" id="charExport">Export backup</button>
+        <button class="btn" type="button" id="charImportBtn">Restore backup</button>
+        <input type="file" id="charImport" accept="application/json,.json" hidden>
+      </div>
+    </div>
+    <p id="charMsg" class="cp-msg" role="status" aria-live="polite"></p>
+    <ul class="char-list" id="charList" data-reveal></ul>
+  </section>
+
+  <section class="cp-sec" id="edit" aria-labelledby="editH">
+    <form class="cp-card editor" id="editor" novalidate>
+      <h2 id="editH">New character</h2>
+      <p class="muted small" id="editNote">Name, rules, classes and ability scores are shared with every tool. For a level-by-level plan, use the <a href="https://wernercd.github.io/dnd-multiclass-planner/">Multiclass Planner</a>; its builds appear here.</p>
+      <div class="ed-row">
+        <label class="f-name">Name <input id="edName" maxlength="60" autocomplete="off" placeholder="Aric" required></label>
+        <label>Rules <select id="edEd"><option value="2024">2024</option><option value="2014">2014</option></select></label>
+      </div>
+      <fieldset class="ed-classes">
+        <legend>Classes <span class="muted small" id="edLvl"></span></legend>
+        <div id="edClasses"></div>
+        <button type="button" class="link" id="edAddCls">+ Add a class (multiclass)</button>
+      </fieldset>
+      <fieldset class="ed-ab">
+        <legend>Ability scores</legend>
+        <div class="seg" role="radiogroup" aria-label="How to set scores" id="abMode">
+          <button type="button" role="radio" data-mode="manual" aria-checked="true">Manual</button>
+          <button type="button" role="radio" data-mode="buy" aria-checked="false">Point buy</button>
+          <button type="button" role="radio" data-mode="array" aria-checked="false">Standard array</button>
+        </div>
+        <p class="muted small" id="abHelp"></p>
+        <div class="ab-grid" id="abGrid"></div>
+        <p class="ab-note small" id="abNote" role="status"></p>
+      </fieldset>
+      <div class="ed-acts">
+        <button class="btn primary" type="submit" id="edSave">Save character</button>
+        <button class="btn" type="button" id="edCancel">Cancel</button>
+        <span class="muted small" id="edMsg" role="status"></span>
+      </div>
+    </form>
+  </section>
+
+  <section class="cp-sec" id="import" aria-labelledby="impH">
+    <div class="cp-card">
+      <h2 id="impH">Import from another site</h2>
+      <p>Bring in a character you already have elsewhere. Pick where it comes from:</p>
+      <div class="seg imp-src" role="tablist" aria-label="Import from" id="impSrc">
+        <button type="button" role="tab" data-src="ddb" aria-selected="true" aria-controls="impPanel">D&amp;D Beyond</button>
+        <button type="button" role="tab" data-src="foundry" aria-selected="false" aria-controls="impPanel">Foundry VTT</button>
+        <button type="button" role="tab" data-src="fc5" aria-selected="false" aria-controls="impPanel">Fight Club 5</button>
+        <button type="button" role="tab" data-src="dicecloud" aria-selected="false" aria-controls="impPanel">DiceCloud</button>
+      </div>
+      <div id="impPanel" role="tabpanel">
+        <div class="imp-pane" data-pane="ddb">
+          <ol class="steps">
+            <li>On D&amp;D Beyond, make the character <b>public</b> (the character's Settings, then Privacy: Public), or skip to step 3.</li>
+            <li>Paste its link (<code>dndbeyond.com/characters/&hellip;</code>) or number, then <b>Fetch</b>.</li>
+          </ol>
+          <div class="imp-row">
+            <label class="f-grow">Character link or number <input id="ddbLink" inputmode="url" autocomplete="off" placeholder="https://www.dndbeyond.com/characters/12345678"></label>
+            <button class="btn primary" type="button" id="ddbFetch">Fetch</button>
+          </div>
+          <p class="imp-err" id="ddbErr" role="alert" hidden></p>
+          <details class="imp-paste" id="ddbPasteBox">
+            <summary>3. Or paste the character data</summary>
+            <p class="small">Open <a id="ddbOpen" href="https://www.dndbeyond.com/characters" target="_blank" rel="noopener noreferrer" aria-disabled="true">the character data</a> in a new tab (you'll see a page of text; signed in to D&amp;D Beyond, this also works for private characters), select all, copy, and paste it here.</p>
+            <textarea id="ddbJson" rows="4" spellcheck="false" placeholder='{"id": ..., "success": true, "data": { ... }}'></textarea>
+            <button class="btn" type="button" id="ddbParse">Read pasted data</button>
+          </details>
+        </div>
+        <div class="imp-pane" data-pane="foundry" hidden>
+          <p>In Foundry, open the <b>Actors</b> tab, right-click the character and choose <b>Export Data</b>. Then pick the <code>.json</code> file. Works with the dnd5e system (versions 3 to 5).</p>
+          <label class="file-pick">Foundry actor file <input type="file" id="foundryFile" accept=".json,application/json"></label>
+        </div>
+        <div class="imp-pane" data-pane="fc5" hidden>
+          <p>In Fight Club 5 or Game Master 5, open the character and export it as <b>XML</b> (share or export menu). Then pick the <code>.xml</code> file.</p>
+          <label class="file-pick">Fight Club 5 file <input type="file" id="fc5File" accept=".xml,text/xml,application/xml"></label>
+        </div>
+        <div class="imp-pane" data-pane="dicecloud" hidden>
+          <p>DiceCloud v2: export the character's JSON (or open <code>dicecloud.com/api/creature/&lt;id&gt;</code> while signed in and save the page), then pick the file.</p>
+          <label class="file-pick">DiceCloud file <input type="file" id="dcFile" accept=".json,application/json"></label>
+        </div>
+        <p class="imp-err" id="impErr" role="alert" hidden></p>
+      </div>
+
+      <div class="preview" id="preview" hidden tabindex="-1" aria-labelledby="pvH">
+        <h3 id="pvH">Preview</h3>
+        <div id="pvBody"></div>
+        <ul class="pv-warn" id="pvWarn"></ul>
+        <div class="pv-match" id="pvMatch"></div>
+        <div class="ed-acts">
+          <button class="btn primary" type="button" id="pvGo">Add character</button>
+          <button class="btn" type="button" id="pvCancel">Cancel</button>
+        </div>
+      </div>
+
+      <details class="imp-about" open>
+        <summary>What is imported, and what stays private</summary>
+        <ul>
+          <li><b>Imported:</b> name, rules edition, classes with levels and subclasses, ability scores, max HP, AC, speed, initiative, saving throw and skill proficiencies, passive scores, resistances and immunities, species and background, and the <em>names</em> of feats, spells and items.</li>
+          <li><b>Not imported:</b> descriptions, rules text, notes, portraits, homebrew text, current HP or spent slots. The tools use their own data for what a feat or spell does.</li>
+          <li><b>Private:</b> files and pasted text are read in this browser only and are never uploaded. The one request this page makes is the D&amp;D Beyond fetch itself, straight from your browser to D&amp;D Beyond.</li>
+          <li>The other tools can then offer to use the imported spells, feats and items; the Character Sheet shows the imported AC, speed, skills and passives.</li>
+        </ul>
+      </details>
+    </div>
+  </section>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <ul class="foot-links">
+      <li><a href="./" aria-current="page">D&amp;D Toolbox</a></li>
+      <li><a href="https://wernercd.github.io/dnd-druid-wildshapes/">Wild Shape Beast List</a></li>
+      <li><a href="https://wernercd.github.io/dnd-items/">Item Finder</a></li>
+      <li><a href="https://wernercd.github.io/dnd-multiclass-planner/">Multiclass Planner</a></li>
+      <li><a href="https://wernercd.github.io/dnd-magic/">Spell Planner</a></li>
+      <li><a href="https://wernercd.github.io/dnd-feats/">Feats &amp; Origins</a></li>
+      <li><a href="https://wernercd.github.io/dnd-rules/">Rules Reference</a></li>
+      <li><a href="https://wernercd.github.io/dnd-monsters/">Monster Lookup</a></li>
+      <li><a href="changes.html">Changes</a></li>
+      <li><a href="https://github.com/WernerCD/dnd" rel="noopener">Source code</a></li>
+      <li><a href="https://github.com/WernerCD/dnd/issues" rel="noopener">Report a problem</a></li>
+    </ul>
+    <p>Unofficial fan content, not affiliated with or endorsed by Wizards of the Coast. Rules text comes from the System Reference Documents 5.1 and 5.2 by Wizards of the Coast LLC, licensed under <a href="https://creativecommons.org/licenses/by/4.0/legalcode" rel="noopener">CC BY 4.0</a>.</p>
+  </div>
+</footer>
+<script src="theme.js?v=dev"></script>
+<script src="nav.js?v=dev"></script>
+<script src="character.js?v=dev"></script>
+<script src="importer.js?v=dev"></script>
+<script src="characters.js?v=dev"></script>
+<script src="version.js?v=dev"></script>
+<script src="motion.js?v=dev" defer></script>
+<script src="ui.js?v=dev" defer></script>
+</body>
+</html>
