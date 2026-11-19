@@ -9,7 +9,7 @@ from pathlib import Path
 
 HUB = Path(__file__).resolve().parents[1]
 ROOT = HUB.parent
-SITES = ["dnd", "dnd-druid-wildshapes", "dnd-items", "dnd-multiclass-planner", "dnd-magic", "dnd-monsters", "dnd-feats"]
+SITES = ["dnd", "dnd-druid-wildshapes", "dnd-items", "dnd-multiclass-planner", "dnd-magic", "dnd-monsters", "dnd-feats", "dnd-rules"]
 BASE = "https://wernercd.github.io/"
 UA = {"User-Agent": "dnd-toolbox-check/1"}
 
