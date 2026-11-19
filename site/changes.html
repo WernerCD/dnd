@@ -13,8 +13,13 @@
 <meta property="og:title" content="Changes · D&amp;D Toolbox">
 <meta property="og:description" content="What has changed on the D&amp;D Toolbox home page.">
 <meta property="og:url" content="https://wernercd.github.io/dnd/changes.html">
-<meta name="twitter:card" content="summary">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2l11 7v14l-11 7-11-7V9z' fill='%23c9a227'/%3E%3C/svg%3E">
+<meta property="og:image" content="https://wernercd.github.io/dnd/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -50,6 +55,9 @@
   <section class="change-day">
     <h3><time datetime="2026-11-19">November 19, 2026</time></h3>
     <ul>
+      <li><b>Search every tool.</b> One search box on the home page finds spells, items, monsters, feats, origins, rules and Wild Shape beasts across all the tools and takes you straight to the entry. Press <kbd>/</kbd> to jump to it. Tools join the search as they publish their lists.</li>
+      <li><b>Works offline.</b> Every page now keeps working with no signal after you've opened it once, and <i>Save every tool for offline use</i> on the home page saves all of them in one go. Phones can add the toolbox to the home screen as an app, with its own icon.</li>
+      <li><b>Link previews.</b> Links shared in Discord or a message now show a preview card for each tool.</li>
       <li><b>Characters page.</b> Characters moved from the bottom of the home page to their own <a href="characters.html">Characters</a> page, with a full editor (up to three classes with subclasses, and ability scores by point buy, standard array or by hand), Share links and backups. On the home page, your saved characters now sit right under Pick a tool, and a Quick build card starts the Build a character group.</li>
       <li><b>Import a character.</b> Bring in a character from D&amp;D Beyond (link or pasted data), a Foundry VTT export, a Fight Club 5 XML file or DiceCloud. You see a preview first; only names and numbers are kept, and files never leave your browser.</li>
     </ul>
@@ -115,5 +123,6 @@
 <script src="theme.js?v=dev"></script>
 <script src="nav.js?v=dev"></script>
 <script src="version.js?v=dev"></script>
+<script src="offline.js?v=dev"></script>
 </body>
 </html>

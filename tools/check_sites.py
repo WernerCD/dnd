@@ -63,7 +63,8 @@ for site in SITES:
     css = (repo / "site" / "styles.css").read_text(encoding="utf-8")
     blk = shared_block(css)
     (ok if blk == canon_css else bad)(site, f"styles.css shared block matches {canon_ver}" if blk == canon_css else f"styles.css shared block differs from {canon_ver} (found {blk and re.search(r'v[\d.]+', blk).group(0)})")
-    for js in ["theme.js", "version.js", "character.js", "motion.js", "ui.js", "nav.js"] + [j for j in ("chart.js", "sources.js") if (repo / "site" / j).exists()]:
+    STATBLOCK_SITES = ("dnd-monsters", "dnd-druid-wildshapes")
+    for js in ["theme.js", "version.js", "character.js", "motion.js", "ui.js", "nav.js", "sw.js", "offline.js"] + (["statblock.js"] if site in STATBLOCK_SITES else []) + [j for j in ("chart.js", "sources.js", "statblock.js") if (repo / "site" / j).exists() and not (j == "statblock.js" and site in STATBLOCK_SITES)]:
         canon = (HUB / "shared" / js).read_text(encoding="utf-8").replace("\r\n", "\n")
         f = repo / "site" / js
         if not f.exists(): bad(site, f"site/{js} missing"); continue
@@ -72,6 +73,16 @@ for site in SITES:
         strip = lambda t: re.sub(r"var OLD_KEY = [^;]*;", "", t)
         same = strip(mine) == strip(canon)
         (ok if same else bad)(site, f"site/{js} matches shared/{js}" if same else f"site/{js} differs from shared/{js}")
+    # icons, link preview and manifest (STYLE 6h) must match shared/images/<repo>/
+    img = HUB / "shared" / "images" / site
+    want = {f"icons/{n}": img / n for n in ("icon-192.png", "icon-512.png", "maskable-512.png", "apple-touch-icon.png", "favicon-32.png")}
+    want["og.png"] = img / "og.png"; want["manifest.webmanifest"] = img / "manifest.webmanifest"
+    rb = lambda f: f.read_bytes().replace(bytes([13]), b"")
+    off = [k for k, src in want.items() if not (repo / "site" / k).exists() or rb(repo / "site" / k) != rb(src)]
+    (ok if not off else bad)(site, "icons, og.png and manifest match shared/images" if not off else f"missing or different from shared/images/{site}/: {off} (STYLE 6h)")
+    if site != "dnd":
+        sj = repo / "site" / "search.json"
+        (ok if sj.exists() else bad)(site, "site/search.json for the hub search" if sj.exists() else "no site/search.json (STYLE 6j)")
     lic = repo / "LICENSE"
     (ok if lic.exists() else bad)(site, "LICENSE present" if lic.exists() else "LICENSE missing (copy shared/LICENSE)")
     chk = repo / "tools" / "check_site.py"
@@ -112,6 +123,8 @@ for site in SITES:
         if page == "" and 'src="character.js?v=' not in html: probs.append("no character.js")
         if page == "" and ('src="motion.js?v=' not in html or 'src="ui.js?v=' not in html): probs.append("no motion.js/ui.js (STYLE 6d)")
         if 'nav.js?v=' not in html: probs.append("no nav.js tool menu (STYLE 3)")
+        if 'offline.js?v=' not in html: probs.append("no offline.js (STYLE 6h)")
+        if 'rel="manifest"' not in html or 'property="og:image"' not in html: probs.append("no manifest/og:image head tags (head v1.4)")
         if page == "" and site != "dnd" and 'href="https://wernercd.github.io/dnd/"' not in html: probs.append("no back-link to hub")
         v = re.search(r'styles\.css\?v=([0-9a-z]+)', html)
         if v and v.group(1) != "dev" and not head.startswith(v.group(1)[:7]): probs.append(f"live page is {v.group(1)}, repo HEAD is {head}")

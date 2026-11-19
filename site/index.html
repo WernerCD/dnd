@@ -13,8 +13,13 @@
 <meta property="og:title" content="D&amp;D Toolbox">
 <meta property="og:description" content="Free D&amp;D 5e helper tools for 2014 and 2024 rules: a multiclass planner, spell planner, feats and origins, Wild Shape beasts, an item finder, a rules reference and a monster lookup.">
 <meta property="og:url" content="https://wernercd.github.io/dnd/">
-<meta name="twitter:card" content="summary">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2l11 7v14l-11 7-11-7V9z' fill='%23c9a227'/%3E%3C/svg%3E">
+<meta property="og:image" content="https://wernercd.github.io/dnd/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -48,7 +53,18 @@
   <section class="hero">
     <h2>Pick a tool</h2>
     <p>Quick, searchable references for building and playing characters. Each tool covers both the 2014 and 2024 rules and runs entirely in your browser.</p>
+    <div class="hub-search" role="search">
+      <label for="hubSearch" class="hs-label">Search every tool</label>
+      <div class="hs-box">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3a7 7 0 0 1 5.6 11.2l5.1 5.1-1.4 1.4-5.1-5.1A7 7 0 1 1 10 3zm0 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10z"/></svg>
+        <input id="hubSearch" type="search" autocomplete="off" spellcheck="false" placeholder="Spells, items, monsters, feats, rules, beasts..." role="combobox" aria-expanded="false" aria-controls="hubResults" aria-autocomplete="list" aria-describedby="hubSearchStat">
+        <kbd aria-hidden="true">/</kbd>
+      </div>
+      <ul id="hubResults" class="hs-results" role="listbox" aria-label="Search results" hidden></ul>
+      <p id="hubSearchStat" class="hs-stat" aria-live="polite"></p>
+    </div>
     <nav class="jump" aria-label="Sections"><a href="#characters">Characters</a><a href="#build">Build</a><a href="#play">Play</a><a href="#run">Run</a></nav>
+    <p class="offline-row" id="offlineRow" hidden><button type="button" class="btn" id="saveAll">Save every tool for offline use</button> <span id="offlineStat" class="small muted" aria-live="polite">For the table when the signal is bad. Your phone can also add the toolbox to its home screen.</span></p>
   </section>
 
   <section class="group chars-strip" id="characters" aria-labelledby="charsH">
@@ -175,7 +191,9 @@
 <script src="nav.js?v=dev"></script>
 <script src="character.js?v=dev"></script>
 <script src="hub.js?v=dev"></script>
+<script src="search.js?v=dev"></script>
 <script src="version.js?v=dev"></script>
+<script src="offline.js?v=dev"></script>
 <script src="motion.js?v=dev" defer></script>
 <script src="ui.js?v=dev" defer></script>
 </body>
