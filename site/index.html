@@ -48,17 +48,22 @@
   <section class="hero">
     <h2>Pick a tool</h2>
     <p>Quick, searchable references for building and playing characters. Each tool covers both the 2014 and 2024 rules and runs entirely in your browser.</p>
-    <nav class="jump" aria-label="Sections"><a href="#build">Build</a><a href="#play">Play</a><a href="#run">Run</a><a href="#characters">Characters</a></nav>
+    <nav class="jump" aria-label="Sections"><a href="#characters">Characters</a><a href="#build">Build</a><a href="#play">Play</a><a href="#run">Run</a></nav>
+  </section>
+
+  <section class="group chars-strip" id="characters" aria-labelledby="charsH">
+    <div class="group-head"><h2 id="charsH">Characters</h2><p id="ccStat">Shared by every tool, stored in this browser.</p><a class="cs-open" href="characters.html">Open Characters &rarr;</a></div>
+    <ul class="cs-list" id="charStrip"></ul>
   </section>
 
   <section class="group" id="build" aria-labelledby="buildH">
     <div class="group-head"><h2 id="buildH">Build a character</h2><p>Plan levels, spells and feats before the session.</p></div>
     <div class="tools" data-reveal>
-    <div class="tool char-card" id="characters" data-spot>
-      <span class="ico"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 15a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11zM5 29c0-6.5 5-11 11-11s11 4.5 11 11z"/></svg></span>
-      <h3>Characters</h3>
-      <p class="cc-stat" id="ccStat">Every tool shares your characters.</p>
-      <form class="cc-form" id="newChar" aria-label="Quick character">
+    <div class="tool quick-card" id="quick" data-spot>
+      <span class="ico"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 15a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11zM5 29c0-6.5 5-11 11-11s11 4.5 11 11z"/><path d="M25 3h2v4h4v2h-4v4h-2V9h-4V7h4z"/></svg></span>
+      <h3>Quick build</h3>
+      <p>Start a character in seconds. Every tool picks it up.</p>
+      <form class="cc-form" id="newChar" aria-label="Quick build">
         <label class="cc-name">Name <input id="ncName" maxlength="60" autocomplete="off" placeholder="Aric"></label>
         <label>Rules <select id="ncEd"><option value="2024">2024</option><option value="2014">2014</option></select></label>
         <label>Class <select id="ncClass"></select></label>
@@ -66,7 +71,7 @@
         <button class="btn primary" type="submit">Add</button>
       </form>
       <p class="cc-msg" id="ccMsg" role="status" aria-live="polite"></p>
-      <a class="go" href="characters.html">Open Characters: edit, share, import &rarr;</a>
+      <a class="go" href="characters.html#edit">Full editor: multiclass, scores, subclass &rarr;</a>
     </div>
     <a class="tool" data-spot href="https://wernercd.github.io/dnd-multiclass-planner/">
       <span class="ico"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3l3.5 8.5L28 13l-6.5 6 1.8 9L16 23.5 8.7 28l1.8-9L4 13l8.5-1.5z"/></svg></span>

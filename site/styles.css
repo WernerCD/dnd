@@ -90,15 +90,30 @@ a.tool:hover, a.tool:focus-visible { transform: translateY(-2px); border-color: 
 .tool.soon { border-style: dashed; box-shadow: none; }
 .tool.soon .go { color: var(--muted); font-weight: 500; }
 
-/* hub Characters card (the full page is characters.html + characters.css) */
-.char-card { border-color: var(--accent); }
-.char-card .cc-stat { margin: 0; font-size: .92rem; color: var(--ink-2); }
-.char-card .cc-stat b { color: var(--ink); }
+/* hub Characters strip and Quick build card (the full page is characters.html + characters.css) */
+.chars-strip .group-head .cs-open { margin-left: auto; font-weight: 600; font-size: .92rem; text-decoration: none; min-height: 24px; display: inline-flex; align-items: center; }
+.chars-strip .group-head .cs-open:hover, .chars-strip .group-head .cs-open:focus-visible { text-decoration: underline; }
+.cs-list { list-style: none; padding: 0; margin: 14px 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.cs-char { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.cs-char.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.cs-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.cs-top b { font-family: Fraunces, Georgia, serif; font-size: 1.05rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cs-char .tag { font-size: .72rem; font-weight: 600; color: var(--accent-ink); background: var(--accent); border-radius: 999px; padding: 1px 8px; flex: none; }
+.cs-sum { margin: 0; font-size: .86rem; color: var(--ink-2); overflow-wrap: anywhere; }
+.cs-acts { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; font-size: .88rem; }
+.cs-acts a { min-height: 24px; display: inline-flex; align-items: center; }
+.cs-empty { color: var(--ink-2); background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius); padding: 14px 16px; grid-column: 1 / -1; }
+.cs-empty p { margin: 0; }
+.quick-card { border-color: var(--accent); }
 .cc-form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; margin: 0; }
 .cc-form label { display: flex; flex-direction: column; gap: 2px; font-size: .78rem; color: var(--muted); min-width: 0; }
 .cc-form .cc-name { grid-column: 1 / -1; }
 .cc-form input, .cc-form select { font: inherit; font-size: .92rem; color: var(--ink); background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; min-height: 34px; width: 100%; }
 .cc-form .btn { justify-content: center; min-height: 34px; align-self: end; }
+.cc-msg { margin: 0; font-size: .85rem; color: var(--accent); min-height: 1.3em; }
+.quick-card .go { text-decoration: none; }
+.quick-card .go:hover, .quick-card .go:focus-visible { text-decoration: underline; }
+.btn { justify-content: center; min-height: 34px; align-self: end; }
 .cc-msg { margin: 0; font-size: .85rem; color: var(--accent); min-height: 1.3em; }
 .char-card .go { text-decoration: none; }
 .char-card .go:hover, .char-card .go:focus-visible { text-decoration: underline; }
@@ -110,7 +125,7 @@ button.link { background: none; border: 0; padding: 2px 0; min-height: 24px; col
 button.link.danger { color: var(--warn); }
 .muted { color: var(--muted); }
 .small { font-size: .85rem; }
-@media print { .cc-form, .cc-msg, .jump, .tool.soon { display: none !important; } }
+@media print { .cc-form, .cc-msg, .cs-acts, .jump, .tool.soon { display: none !important; } }
 
 /* === dnd-shared v1.9.1 (canonical copy: WernerCD/dnd shared/dnd-shared.css) === */
 /* Paste this block unchanged at the END of each site's styles.css. Do not edit it per site;
