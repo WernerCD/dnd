@@ -66,7 +66,19 @@ a { color: var(--accent); }
 .hero { padding: 40px 0 8px; }
 .hero h2 { font-size: clamp(1.6rem, 4vw, 2.3rem); }
 .hero p { color: var(--ink-2); max-width: 62ch; }
-.tools { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin: 24px 0 40px; }
+.tools { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin: 14px 0 0; }
+.jump { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
+.jump a { display: inline-flex; align-items: center; min-height: 32px; padding: 4px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink-2); font-size: .9rem; font-weight: 500; text-decoration: none; }
+.jump a:hover, .jump a:focus-visible { border-color: var(--accent); color: var(--accent); }
+.group { margin: 34px 0 0; scroll-margin-top: 16px; }
+.group-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+.group-head h2 { font-size: 1.45rem; margin: 0; }
+.group-head p { margin: 0; color: var(--muted); font-size: .92rem; }
+.tool.soon { box-shadow: none; border-style: dashed; background: transparent; }
+.tool.soon .ico { background: var(--surface-2); }
+.tool.soon .ico svg { fill: var(--muted); }
+.tool.soon .go { color: var(--muted); font-weight: 500; }
+#characters { scroll-margin-top: 16px; }
 .tool { display: flex; flex-direction: column; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); text-decoration: none; color: inherit; transition: transform .12s ease, border-color .12s ease; }
 a.tool:hover, a.tool:focus-visible { transform: translateY(-2px); border-color: var(--accent); }
 .tool .ico { width: 44px; height: 44px; border-radius: 12px; background: var(--chip); display: grid; place-items: center; }
@@ -79,7 +91,7 @@ a.tool:hover, a.tool:focus-visible { transform: translateY(-2px); border-color: 
 .tool.soon .go { color: var(--muted); font-weight: 500; }
 
 /* characters */
-.chars { margin: 8px 0 40px; }
+.chars { margin: 40px 0 40px; }
 .chars > h2 { font-size: 1.5rem; margin-bottom: 6px; }
 .chars .intro { color: var(--ink-2); max-width: 780px; margin: 0 0 16px; }
 .char-list { list-style: none; padding: 0; margin: 0 0 18px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
@@ -106,7 +118,7 @@ button.link.danger { color: var(--warn); }
 .nc-row input#ncLvl { width: 64px; }
 .muted { color: var(--muted); }
 .small { font-size: .85rem; }
-@media print { .new-char, .char-io, .char-tools, .char-acts { display: none !important; } }
+@media print { .new-char, .char-io, .char-tools, .char-acts, .jump, .tool.soon { display: none !important; } }
 
 /* === dnd-shared v1.8 (canonical copy: WernerCD/dnd shared/dnd-shared.css) === */
 /* Paste this block unchanged at the END of each site's styles.css. Do not edit it per site;
