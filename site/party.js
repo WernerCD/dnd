@@ -22,7 +22,9 @@
   // ---------- reusable party numbers ----------
   // XP needed to reach each level (SRD 5.1 / 5.2 Character Advancement; the same in both editions). XP[lvl - 1].
   var XP = [0, 300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 64000, 85000, 100000, 120000, 140000, 165000, 195000, 225000, 265000, 305000, 355000];
-  function levelOf(ch) { var P = sum(ch, REPOS.planner); return int(P && P.lvl, 1, 20) || C.level(ch) || 1; }
+  // the planner summary is for the full planned build; the shared record says where the character is now
+  function levelOf(ch) { var P = sum(ch, REPOS.planner); return C.level(ch) || int(P && P.lvl, 1, 20) || 1; }
+  function maxHp(ch) { var P = sum(ch, REPOS.planner), p = play(ch.id) || {}, pl = int(P && P.lvl, 1, 20), ahead = pl && C.level(ch) && pl > C.level(ch); return (!ahead && int(P && P.hp, 1, 999)) || int(p.max, 1, 999) || null; }
   var DndParty = {
     XP: XP,
     xpFor: function (lvl) { return XP[(int(lvl, 1, 20) || 1) - 1]; },
@@ -96,7 +98,7 @@
   var chart = null, chartMode = 'lvl';
   function cardFor(ch) {
     var P = sum(ch, REPOS.planner), p = play(ch.id) || {};
-    var lvl = levelOf(ch), max = int(P && P.hp, 1, 999) || int(p.max, 1, 999);
+    var lvl = levelOf(ch), max = maxHp(ch);
     var cur = p.hp == null ? max : int(p.hp, 0, 999); if (max && cur != null) cur = Math.min(cur, max);
     var ac = num(field(ch, 'ac')), pv = field(ch, 'passive'), prc = pv && typeof pv === 'object' ? num(pv.prc) : null;
     var dcs = arr(P && P.dc).map(function (d) { return d && int(d.dc, 1, 40); }).filter(Boolean);
@@ -146,7 +148,7 @@
 
   function overview(list) {
     var s = DndParty.stats(list);
-    var hpTot = list.reduce(function (t, ch) { var P = sum(ch, REPOS.planner), p = play(ch.id) || {}; return t + (int(P && P.hp, 1, 999) || int(p.max, 1, 999) || 0); }, 0);
+    var hpTot = list.reduce(function (t, ch) { var P = sum(ch, REPOS.planner), p = play(ch.id) || {}; return t + (maxHp(ch) || 0); }, 0);
     var H = healers(list);
     $('ptKpis').innerHTML = [
       ['Members', s.n],
@@ -191,7 +193,7 @@
   function drawChart(list) {
     if (!window.DndPlot) return;
     var labels = list.map(function (ch) { return ch.name.length > 12 ? ch.name.slice(0, 11) + '…' : ch.name; });
-    var vals = chartMode === 'hp' ? list.map(function (ch) { var P = sum(ch, REPOS.planner), p = play(ch.id) || {}; return int(P && P.hp, 1, 999) || int(p.max, 1, 999) || 0; }) : DndParty.levels(list);
+    var vals = chartMode === 'hp' ? list.map(function (ch) { return maxHp(ch) || 0; }) : DndParty.levels(list);
     var opts = { labels: labels, values: vals, name: chartMode === 'hp' ? 'Max HP' : 'Level', xLabel: 'Party member', yLabel: chartMode === 'hp' ? 'Max HP' : 'Level',
       title: chartMode === 'hp' ? 'Max hit points by party member' : 'Character level by party member' };
     var sig = JSON.stringify(opts);

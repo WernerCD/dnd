@@ -34,7 +34,8 @@
   var EXH14 = ['', 'Disadvantage on ability checks', 'Speed halved', 'Disadvantage on attack rolls and saving throws', 'Hit point maximum halved', 'Speed reduced to 0', 'Death'];
   var PER = { short: 'Short rest', long: 'Long rest', turn: 'Per turn', day: 'Per day' };
   var ORD = ['Cantrips', '1st level', '2nd level', '3rd level', '4th level', '5th level', '6th level', '7th level', '8th level', '9th level'];
-  var TIME = { '1A': 'Action', '1BA': 'Bonus action', '1R': 'Reaction' };
+  var TIME = { '1A': 'Action', '1BA': 'Bonus action', '1R': 'Reaction', '1m': '1 minute', '10m': '10 minutes', '1h': '1 hour', '8h': '8 hours', '12h': '12 hours', '24h': '24 hours' };
+  var HD = { barbarian: 12, fighter: 10, paladin: 10, ranger: 10, sorcerer: 6, wizard: 6 };   // every other class: d8
   var PKEY = 'dnd.sheet.play';
 
   // ---------- data from the shared record and the summaries ----------
@@ -48,22 +49,24 @@
   function isCaster(ch) { return ch.classes.some(function (x) { return CASTERS.indexOf(x.cls) >= 0 || THIRD.test(x.subName || x.sub || ''); }); }
   function model(ch) {
     var P = sum(ch, TOOL.planner.repo), M = sum(ch, TOOL.magic.repo), W = sum(ch, TOOL.wild.repo), F = sum(ch, TOOL.feats.repo), I = sum(ch, TOOL.items.repo);
-    var lvl = int(P && P.lvl, 1, 20) || C.level(ch) || 1;
+    // the planner's summary is for the full planned build; the shared record's classes are where the character is now
+    var now = C.level(ch), planLvl = int(P && P.lvl, 1, 20), lvl = now || planLvl || 1, ahead = !!(planLvl && now && planLvl > now);
     var ab = P && Array.isArray(P.ab) && P.ab.length === 6 && P.ab.every(function (n) { return num(n) != null; }) ? P.ab.map(function (n) { return int(n, 1, 30); }) : ch.ab;
     var m = {
-      ch: ch, P: P, M: M, W: W, F: F, I: I, lvl: lvl,
-      pb: int(P && P.pb, 2, 6) || Math.ceil(lvl / 4) + 1, pbGuess: !(P && num(P.pb)),
+      ch: ch, P: P, M: M, W: W, F: F, I: I, lvl: lvl, planLvl: planLvl, ahead: ahead,
+      pb: (!ahead && int(P && P.pb, 2, 6)) || Math.ceil(lvl / 4) + 1, pbGuess: ahead || !(P && num(P.pb)),
       ab: ab, abFromPlanner: ab !== ch.ab,
       mod: function (a) { return Math.floor((ab[ABIL.indexOf(a)] - 10) / 2); },
       saves: arr(P && P.saves).map(function (s) { return String(s).toLowerCase().slice(0, 3); }),
-      hp: int(P && P.hp, 1, 999),
-      hd: parseHD(P && P.hd),
+      hp: ahead ? null : int(P && P.hp, 1, 999), planHp: int(P && P.hp, 1, 999),
+      hd: ahead || !(P && P.hd) ? hdFromClasses(ch) : parseHD(P.hd),
       slots: Array.isArray(P && P.slots) ? P.slots.slice(0, 9).map(function (n) { return int(n, 0, 9) || 0; }) : [],
       pact: P && P.pact && typeof P.pact === 'object' ? { n: int(P.pact.n, 0, 9) || 0, lvl: int(P.pact.lvl, 1, 9) || 1 } : null,
       dc: arr(P && P.dc).filter(function (d) { return d && typeof d === 'object'; }).slice(0, 6),
+      dcAhead: ahead,
       attacks: int(P && P.attacks, 1, 8),
-      res: arr(P && P.res).filter(function (r) { return r && r.name; }).slice(0, 40).map(function (r) { return { name: str(r.name, 60), max: int(r.max, 0, 99) || 0, per: PER[r.per] ? r.per : 'long', note: str(r.note, 120) }; }),
-      wsUses: int(W && W.uses, 0, 20),
+      res: arr(P && P.res).filter(function (r) { return r && r.name; }).slice(0, 40).map(function (r) { var per = PER[r.per] ? r.per : 'long'; return { name: str(r.name, 60), max: per === 'turn' ? 0 : (int(r.max, 0, 99) || 0), per: per, note: str(r.note, 120) }; }),   // per-turn (Sneak Attack) and unlimited pools get no pips
+      ws: parseUses(W && W.uses),
       ed: ch.ed,
       ac: num(firstField(ch, 'ac')), speed: firstField(ch, 'speed'), init: num(firstField(ch, 'init')), passive: firstField(ch, 'passive'),
       resist: firstField(ch, 'resist'), immune: firstField(ch, 'immune')
@@ -72,6 +75,15 @@
     m.caster = isCaster(ch) || !!M || m.slots.some(Boolean) || !!m.pact || m.dc.length > 0;
     m.druid = C.levelIn(ch, 'druid') > 0 || !!W;
     return m;
+  }
+  function hdFromClasses(ch) {   // hit dice from the shared record's classes (the character's current levels)
+    var by = {}; ch.classes.forEach(function (x) { var d = HD[x.cls] || 8; by[d] = (by[d] || 0) + x.lvl; });
+    return Object.keys(by).map(Number).sort(function (a, b) { return b - a; }).map(function (d) { return { n: Math.min(20, by[d]), d: d }; });
+  }
+  function parseUses(u) {   // Wild Shape publishes a display string: "3 / long rest", "2 / short rest", "Unlimited" (or a plain number)
+    if (u == null || u === '') return null;
+    var t = str(u, 40), unl = /unlimited/i.test(t), n = int((/\d+/.exec(t) || [])[0], 0, 20);
+    return { label: typeof u === 'number' ? '' : t, n: unl ? 0 : (n || 0), unl: unl, per: /short/i.test(t) ? 'short' : /long/i.test(t) ? 'long' : null };
   }
   function parseHD(s) {   // "3d12+5d8" -> [{n:3, d:12}, {n:5, d:8}]
     var out = []; String(s || '').replace(/(\d+)\s*d\s*(\d+)/gi, function (_, n, d) { n = int(n, 0, 20); d = int(d, 4, 12); if (n && d) out.push({ n: n, d: d }); return ''; });
@@ -137,7 +149,8 @@
       pv && num(pv.prc) != null ? ['Passive Perception', num(pv.prc)] : ['Passive Wisdom', wisP, 'Passive Perception before any proficiency: 10 + Wisdom modifier'],
       m.attacks ? ['Attacks', m.attacks + ' per action'] : null
     ].filter(Boolean);
-    var lvlNote = m.P && int(m.P.lvl, 1, 20) && int(m.P.lvl, 1, 20) !== C.level(ch) ? '<p class="sh-note">The Multiclass Planner summary is for level ' + int(m.P.lvl, 1, 20) + '; the character is level ' + C.level(ch) + '. Open the planner to update it.</p>' : '';
+    var lvlNote = m.ahead ? '<p class="sh-note warn">The Multiclass Planner build goes to level ' + m.planLvl + '; the character is level ' + m.lvl + ' now. Level, proficiency, hit dice, features and feats here follow level ' + m.lvl + '. Slots and resources are from the level ' + m.planLvl + ' plan, and max HP needs setting by hand.</p>'
+      : m.planLvl && m.planLvl < m.lvl ? '<p class="sh-note">The Multiclass Planner build stops at level ' + m.planLvl + '; the character is level ' + m.lvl + '.</p>' : '';
     return '<section class="sh-top" aria-labelledby="shName">' +
       '<div class="sh-id"><h2 id="shName">' + esc(ch.name) + '</h2>' +
       '<p class="sh-cls">' + (esc(C.summary(ch)) || 'No classes yet') + (subs ? ' &middot; ' + subs : '') + ' &middot; ' + ch.ed + ' rules' + (origin ? '<br>' + origin : '') + '</p></div>' +
@@ -155,7 +168,7 @@
       '<button type="button" class="btn dmg" data-a="dmg" data-k="dmg">Damage</button><button type="button" class="btn heal" data-a="heal" data-k="heal">Heal</button>' +
       '<button type="button" class="btn" data-a="temp" data-k="temp" title="Temporary hit points don\'t stack: this replaces them">Temp HP</button></div>';
     if (!m.hp) h += '<div class="sh-ctl hp-setmax"><label>Max HP <input id="hpMax" type="number" inputmode="numeric" min="1" max="999" value="' + (p.max || '') + '"></label>' +
-      (m.P ? '<span class="muted small">The planner has no HP for this character.</span>' : '') + '</div>';
+      (m.ahead && m.planHp ? '<span class="muted small">The plan\'s ' + m.planHp + ' HP is for level ' + m.planLvl + '.</span>' : m.P ? '<span class="muted small">The planner has no HP for this character.</span>' : '') + '</div>';
     if (m.hd.length) {
       var con = m.mod('con');
       h += '<div class="sh-row"><span class="sh-lbl">Hit dice <span class="muted">(' + sign(con) + ' Con each)</span></span><span class="sh-pipset">' +
@@ -193,35 +206,45 @@
       return '<div class="ab"><span class="ab-n" title="' + ABN[a] + '">' + a.toUpperCase() + '</span><b class="ab-m">' + sign(mod) + '</b><span class="ab-s">' + m.ab[i] + '</span>' +
         '<span class="ab-sv' + (prof ? ' prof' : '') + '" title="' + ABN[a] + ' saving throw' + (prof ? ' (proficient)' : '') + '">Save ' + sign(mod + (prof ? m.pb : 0)) + (prof ? ' &#9679;' : '') + '</span></div>';
     }).join('') + '</div>';
-    var note = m.abFromPlanner ? '' : '<p class="sh-note">' + (m.P ? 'Scores from the shared character; the planner did not send final scores.' : 'Scores from the shared character, before any planned increases.') + (m.saves.length ? '' : ' Saving throw proficiencies come from the Multiclass Planner.') + '</p>';
-    return card('ab', 'Abilities and saves', m.P ? src(m, 'planner') : '', h + note + (m.pbGuess ? '<p class="sh-note">Proficiency bonus worked out from total level.</p>' : ''));
+    var note = m.abFromPlanner ? '<p class="sh-note">Ability scores as entered in the planner (it doesn\'t add increases from feats or ASIs).</p>' : '<p class="sh-note">' + (m.P ? 'Scores from the shared character; the planner did not send final scores.' : 'Scores from the shared character, before any planned increases.') + (m.saves.length ? '' : ' Saving throw proficiencies come from the Multiclass Planner.') + '</p>';
+    return card('ab', 'Abilities and saves', m.P ? src(m, 'planner') : '', h + note + (m.pbGuess ? '<p class="sh-note">Proficiency bonus worked out from the current total level.</p>' : ''));
   }
 
   function spellcasting(m, p) {
     var h = '';
     if (m.dc.length) h += '<dl class="sh-dc">' + m.dc.map(function (d) {
       var ab = String(d.abil || '').toLowerCase().slice(0, 3);
-      return '<div><dt>' + esc(ABN[ab] || cap(str(d.abil, 20)) || 'Spells') + '</dt><dd>DC <b>' + (int(d.dc, 1, 40) || '?') + '</b> &middot; attack <b>' + (num(d.atk) != null ? sign(int(d.atk, -10, 30)) : '?') + '</b></dd></div>';
+      var redo = m.dcAhead && ABN[ab];   // plan ahead of the character: 8 + current proficiency + modifier
+      return '<div><dt>' + esc(ABN[ab] || cap(str(d.abil, 20)) || 'Spells') + '</dt><dd>DC <b>' + (redo ? 8 + m.pb + m.mod(ab) : int(d.dc, 1, 40) || '?') + '</b> &middot; attack <b>' + (redo ? sign(m.pb + m.mod(ab)) : num(d.atk) != null ? sign(int(d.atk, -10, 30)) : '?') + '</b></dd></div>';
     }).join('') + '</dl>';
     var any = false, rows = '';
     m.slots.forEach(function (n, i) { if (!n) return; any = true; var used = Math.min(p.slots[i], n); rows += '<div class="slot"><span class="slot-l">' + ORD[i + 1].replace(' level', '') + '</span>' + pips('slot:' + i, n, n - used, ORD[i + 1] + ' slots') + '<span class="slot-c">' + (n - used) + '/' + n + '</span></div>'; });
     if (m.pact) { any = true; var pu = Math.min(p.pact, m.pact.n); rows += '<div class="slot pact"><span class="slot-l">Pact (' + ORD[m.pact.lvl].replace(' level', '') + ')</span>' + pips('pact', m.pact.n, m.pact.n - pu, 'Pact slots') + '<span class="slot-c">' + (m.pact.n - pu) + '/' + m.pact.n + '</span></div>'; }
-    if (any) h += '<div class="slots"><h4>Spell slots</h4>' + rows + (m.pact ? '<p class="sh-note">Pact slots come back on a short rest.</p>' : '') + '</div>';
+    if (any) h += '<div class="slots"><h4>Spell slots' + (m.ahead ? ' <span class="warn">(level ' + m.planLvl + ' plan)</span>' : '') + '</h4>' + rows + (m.pact ? '<p class="sh-note">Pact slots come back on a short rest.</p>' : '') + '</div>';
     var links = m.P ? src(m, 'planner') : '';
     if (!m.P) h += missing(m, 'planner', 'slots and spell save DCs');
     // spells
     links += m.M ? ' ' + src(m, 'magic') : '';
     if (m.M) {
-      var by = {}; arr(m.M.spells).forEach(function (s) { if (!s || !s.n) return; var l = int(s.lvl, 0, 9) || 0; (by[l] = by[l] || []).push(s); });
-      var lv = Object.keys(by).map(Number).sort(function (a, b) { return a - b; });
+      var all = arr(m.M.spells).filter(function (x) { return x && x.n; });
+      var groups = [], gi = {};   // by class when the Spell Planner says which class a spell counts for (multiclass), then by level
+      all.forEach(function (x) { var c = str(x.cls, 30); if (!(c in gi)) { gi[c] = groups.length; groups.push({ cls: c, by: {} }); } var g = groups[gi[c]], l = int(x.lvl, 0, 9) || 0; (g.by[l] = g.by[l] || []).push(x); });
+      var multi = groups.length > 1;
+      var item = function (x) {
+        var t = str(x.t, 12), on = p.conc && p.conc === str(x.n, 80), unprep = x.p === 0 || x.p === '0';
+        return '<li class="' + (on ? 'concing' : '') + (unprep ? ' unprep' : '') + '"><span class="sp-n">' + esc(str(x.n, 80)) + '</span>' +
+          (x.conc ? '<abbr class="mk c" title="Concentration">C</abbr>' : '') + (x.rit ? '<abbr class="mk r" title="Ritual">R</abbr>' : '') +
+          (x.always ? '<span class="tag soft" title="Always prepared (subclass or feature)">always</span>' : '') +
+          (x.other ? '<span class="tag soft" title="From a feat or item">feat/item</span>' : '') +
+          (unprep ? '<span class="tag soft" title="In the spellbook, not prepared">not prepared</span>' : '') +
+          '<span class="sp-m">' + esc(TIME[t] || t) + (x.r ? ' &middot; ' + esc(str(x.r, 30)) : '') + '</span></li>';
+      };
       h += '<div class="spells"><h4>Spells' + (m.M.list ? ' <span class="muted">&middot; ' + esc(str(m.M.list, 60)) + '</span>' : '') + '</h4>' +
-        (lv.length ? lv.map(function (l) {
-          return '<div class="sp-lvl"><h5>' + ORD[l] + '</h5><ul>' + by[l].map(function (s) {
-            var t = str(s.t, 12), on = p.conc && p.conc === str(s.n, 80);
-            return '<li' + (on ? ' class="concing"' : '') + '><span class="sp-n">' + esc(str(s.n, 80)) + '</span>' +
-              (s.conc ? '<abbr class="mk c" title="Concentration">C</abbr>' : '') + (s.rit ? '<abbr class="mk r" title="Ritual">R</abbr>' : '') +
-              '<span class="sp-m">' + esc(TIME[t] || t) + (s.r ? ' &middot; ' + esc(str(s.r, 30)) : '') + '</span></li>';
-          }).join('') + '</ul></div>';
+        (all.length ? groups.map(function (g) {
+          var lv = Object.keys(g.by).map(Number).sort(function (a, b) { return a - b; });
+          return (multi ? '<h5 class="sp-cls">' + esc(g.cls ? cap(g.cls) : 'Other') + '</h5>' : '') + lv.map(function (l) {
+            return '<div class="sp-lvl"><h5>' + ORD[l] + '</h5><ul>' + g.by[l].map(item).join('') + '</ul></div>';
+          }).join('');
         }).join('') : '<p class="muted">No spells chosen yet.</p>') + '</div>' + edNote(m, m.M, 'magic');
     } else h += missing(m, 'magic', 'spells');
     return card('spells', 'Spellcasting', links, h, true);
@@ -243,32 +266,49 @@
   function wildshape(m, p) {
     var W = m.W, h = '';
     if (!W) return card('ws', 'Wild Shape', '', missing(m, 'wild', 'forms'));
-    if (m.wsUses) { var used = Math.min(p.ws, m.wsUses); h += '<div class="sh-row"><span class="sh-lbl">Uses <span class="slot-c">' + (m.wsUses - used) + '/' + m.wsUses + '</span></span>' + pips('ws', m.wsUses, m.wsUses - used, 'Wild Shape uses') +
-      '<span class="res-per">' + ((W.ed || m.ed) === '2014' ? 'Short or long rest' : 'One back on a short rest, all on a long rest') + '</span></div>'; }
+    var plannerWS = wsRes(m), U = m.ws, wsEd = (W.ed || m.ed);
+    if (plannerWS) h += '<p class="small muted">Uses are tracked under Resources, from the Multiclass Planner.</p>';
+    else if (U && U.unl) h += '<p class="small">Uses: <b>' + esc(U.label || 'Unlimited') + '</b></p>';
+    else if (U && U.n) { var used = Math.min(p.ws, U.n); h += '<div class="sh-row"><span class="sh-lbl">Uses <span class="slot-c">' + (U.n - used) + '/' + U.n + '</span></span>' + pips('ws', U.n, U.n - used, 'Wild Shape uses') +
+      '<span class="res-per">' + (U.per === 'short' || wsEd === '2014' ? 'All back on a short or long rest' : 'One back on a short rest, all on a long rest') + '</span></div>'; }
     if (W.maxcr != null) h += '<p class="small muted">Highest CR: ' + esc(str(W.maxcr, 8)) + '</p>';
     var forms = arr(W.forms).filter(function (f) { return f && f.n; }).slice(0, 60);
     h += forms.length ? '<div class="tw"><table class="forms"><thead><tr><th scope="col">Form</th><th scope="col">CR</th><th scope="col">AC</th><th scope="col">HP</th><th scope="col">Speed</th></tr></thead><tbody>' +
-      forms.map(function (f) { return '<tr><th scope="row">' + esc(str(f.n, 60)) + '</th><td>' + esc(str(f.cr, 6)) + '</td><td>' + esc(str(f.ac, 6)) + '</td><td>' + esc(str(f.hp, 8)) + '</td><td>' + esc(str(f.spd, 40)) + '</td></tr>'; }).join('') + '</tbody></table></div>'
+      forms.map(function (f) { var d = function (v, n) { v = str(v, n); return v ? esc(v) : '&ndash;'; }; return '<tr><th scope="row">' + esc(str(f.n, 60)) + '</th><td>' + d(f.cr, 6) + '</td><td>' + d(f.ac, 6) + '</td><td>' + d(f.hp, 8) + '</td><td>' + d(f.spd, 40) + '</td></tr>'; }).join('') + '</tbody></table></div>'
       : '<p class="muted">No forms starred yet.</p>';
     return card('ws', 'Wild Shape', src(m, 'wild'), h + edNote(m, W, 'wild'));
   }
 
+  function wsRes(m) { for (var i = 0; i < m.res.length; i++) if (/wild\s*shape/i.test(m.res[i].name) && m.res[i].max) return m.res[i]; return null; }
   function featsFeatures(m) {
-    var P = m.P, F = m.F, h = '', seen = {};
-    var list = [];
-    arr(F && F.feats).forEach(function (f) { if (!f || !f.n) return; var k = str(f.n, 80).toLowerCase(); seen[k] = list.length; list.push({ n: str(f.n, 80), cat: str(f.cat, 30), st: f.status === 'planned' ? 'planned' : 'taken', lvl: null }); });
-    arr(P && P.feats).forEach(function (f) { if (!f || !f.name) return; var k = str(f.name, 80).toLowerCase(); if (k in seen) list[seen[k]].lvl = int(f.lvl, 1, 20); else { seen[k] = list.length; list.push({ n: str(f.name, 80), cat: '', st: '', lvl: int(f.lvl, 1, 20) }); } });
+    var P = m.P, F = m.F, h = '';
+    var fo = arr(F && F.feats).filter(function (f) { return f && f.n; }).map(function (f) { return { n: str(f.n, 80), cat: str(f.cat, 30), st: f.status === 'planned' ? 'planned' : 'taken', lvl: null }; });
+    var taken = fo.filter(function (f) { return f.st === 'taken' && !/origin/i.test(f.cat); }), list = [];
+    arr(P && P.feats).filter(function (f) { return f && f.name; }).sort(function (a, b) { return (a.lvl || 0) - (b.lvl || 0); }).forEach(function (f) {
+      var lv = int(f.lvl, 1, 20), nm = str(f.name, 80), slot = /^(asi or feat|epic boon)$/i.test(nm);
+      var named = slot ? taken.shift() : null;
+      if (named) { named.lvl = lv; named.used = true; list.push(named); }
+      else list.push({ n: nm, cat: '', st: '', lvl: lv, slot: slot });
+    });
+    fo.forEach(function (f) { if (!f.used) list.push(f); });
+    list.forEach(function (f) { if (f.lvl && f.lvl > m.lvl) f.later = true; });
     h += '<h4>Feats</h4>' + (list.length ? '<ul class="feats">' + list.map(function (f) {
-      return '<li>' + (f.lvl ? '<span class="lv">L' + f.lvl + '</span>' : '') + '<span>' + esc(f.n) + '</span>' + (f.cat ? '<span class="muted small"> ' + esc(f.cat) + '</span>' : '') + (f.st === 'planned' ? '<span class="tag soft">planned</span>' : '') + '</li>';
+      return '<li' + (f.later ? ' class="unprep"' : '') + '>' + (f.lvl ? '<span class="lv">L' + f.lvl + '</span>' : '') + '<span' + (f.slot ? ' class="muted"' : '') + '>' + esc(f.n) + '</span>' + (f.cat ? '<span class="muted small"> ' + esc(f.cat) + '</span>' : '') +
+        (f.st === 'planned' ? '<span class="tag soft">planned</span>' : '') + (f.later ? '<span class="tag soft">at level ' + f.lvl + '</span>' : '') + '</li>';
     }).join('') + '</ul>' : (P || F ? '<p class="muted">No feats yet.</p>' : missing(m, 'feats', 'feats, species and background')));
     if (P) {
       var by = {}, order = [];
-      arr(P.features).forEach(function (f) { if (!f || !f.name) return; var c = str(f.cls, 30).toLowerCase() || 'other'; if (!by[c]) { by[c] = []; order.push(c); } by[c].push(f); });
+      var later = 0;
+      arr(P.features).forEach(function (f) {
+        if (!f || !f.name) return; var c = str(f.cls, 30).toLowerCase() || 'other', have = C.levelIn(m.ch, c);
+        if (have && int(f.lvl, 1, 20) > have) { later++; return; }   // planned for a later level of that class
+        if (!by[c]) { by[c] = []; order.push(c); } by[c].push(f);
+      });
       h += '<h4>Features</h4>' + (order.length ? order.map(function (c) {
         return '<div class="feat-cls"><h5>' + esc(cap(c)) + '</h5><ul class="feat-list">' + by[c].sort(function (a, b) { return (a.lvl || 0) - (b.lvl || 0); }).map(function (f) {
           return '<li><span class="lv">' + (int(f.lvl, 1, 20) || '') + '</span>' + esc(str(f.name, 80)) + '</li>';
         }).join('') + '</ul></div>';
-      }).join('') : '<p class="muted">No features listed.</p>');
+      }).join('') : '<p class="muted">No features listed.</p>') + (later ? '<p class="sh-note">' + later + ' more feature' + (later === 1 ? '' : 's') + ' planned for later levels.</p>' : '');
       var pr = P.prof && typeof P.prof === 'object' ? P.prof : null;
       if (pr && (pr.armor || pr.weapons || pr.tools)) h += '<h4>Proficiencies</h4><dl class="prof">' + [['Armor', pr.armor], ['Weapons', pr.weapons], ['Tools', pr.tools]].filter(function (x) { return x[1]; }).map(function (x) { return '<div><dt>' + x[0] + '</dt><dd>' + esc(str(x[1], 200)) + '</dd></div>'; }).join('') + '</dl>';
     } else h += '<h4>Features</h4>' + missing(m, 'planner', 'class features');
@@ -340,8 +380,10 @@
     setPlay(cur.id, function (p) {
       m.res.forEach(function (r) { if (kind === 'long' || r.per === 'short' || r.per === 'turn') delete p.res[r.name]; });
       p.pact = 0;
-      var ws14 = (m.W && m.W.ed || m.ed) === '2014';
-      if (kind === 'long' || ws14) p.ws = 0; else p.ws = Math.max(0, p.ws - 1);
+      var ws14 = (m.W && m.W.ed || m.ed) === '2014', wsShort = ws14 || (m.ws && m.ws.per === 'short');
+      if (kind === 'long' || wsShort) p.ws = 0; else p.ws = Math.max(0, p.ws - 1);
+      // 2024 Wild Shape tracked under the planner's resources: one use back on a short rest
+      var wr = wsRes(m); if (wr && kind === 'short' && wr.per === 'long' && !ws14 && p.res[wr.name]) { if (p.res[wr.name] > 1) p.res[wr.name]--; else delete p.res[wr.name]; }
       if (kind === 'long') {
         p.hp = null; p.temp = 0; p.slots = [0, 0, 0, 0, 0, 0, 0, 0, 0]; p.ds = [0, 0]; p.exh = Math.max(0, p.exh - 1);
         if (m.ed === '2014') {   // regain spent hit dice up to half the total (at least one), biggest dice first
@@ -364,7 +406,7 @@
         if (parts[0] === 'slot') p.slots[+parts[1]] = Math.max(0, m.slots[+parts[1]] - next);
         else if (parts[0] === 'pact') p.pact = Math.max(0, m.pact.n - next);
         else if (parts[0] === 'res') { var r = m.res[+parts[1]]; if (r) { if (r.max - next) p.res[r.name] = r.max - next; else delete p.res[r.name]; } }
-        else if (parts[0] === 'ws') p.ws = Math.max(0, m.wsUses - next);
+        else if (parts[0] === 'ws') p.ws = Math.max(0, (m.ws ? m.ws.n : 0) - next);
         else if (parts[0] === 'hd') { var x = m.hd.filter(function (h) { return h.d === +parts[1]; })[0]; if (x) { if (x.n - next) p.hd['d' + x.d] = x.n - next; else delete p.hd['d' + x.d]; } }
         else if (parts[0] === 'ds') p.ds[+parts[1]] = next;
       });
