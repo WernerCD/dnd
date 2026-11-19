@@ -149,6 +149,7 @@ Each tool site publishes `site/search.json` for the hub's "Search every tool" bo
 - Sites that are already live are pushed without asking again. Only a new public repo needs Chris's yes.
 
 ## Revisions
+- v1.13.2 (2026-11-19): `nav.js` v1.0.2: Run menu gains Encounter Builder (`dnd-monsters/#encounter`); menu entries with a #hash are marked current only on that view.
 - v1.13.1 (2026-11-19): 6h: no `offline.js` on 404 pages; apps that rewrite the URL keep parameters they don't own (`?sw=1`).
 - v1.13 (2026-11-19): offline sites, app icons and link previews (6h: `sw.js`, `offline.js`, `shared/images/`, head v1.4), the shared stat block (6i: `statblock.js`, CSS v1.10), the hub search list (6j: `search.json`) and smoke test v1.1.
 - v1.12.1 (2026-11-19): smoke tests run in their own `test` job inside Playwright's container image (about 50 s instead of an 8-minute browser install); `deploy` needs it.
