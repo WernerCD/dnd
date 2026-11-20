@@ -232,3 +232,13 @@ h5.sp-cls { column-span: all; font-family: Fraunces, Georgia, serif; font-size: 
 /* dice roller entry (dice.js, STYLE 6k) */
 .sh-dice { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 4px 0 10px; }
 @media print { .sh-dice { display: none; } }
+
+/* attacks (weapons from the import, plus your own) */
+.atk td, .atk th { vertical-align: top; }
+.atk .link { min-height: 24px; }
+.atk-add { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin: 10px 0 4px; }
+.atk-add input { min-height: 36px; flex: 1 1 8em; min-width: 0; }
+.atk-add #atkH { flex: 0 1 6em; }
+.atk-add .sh-lbl { flex-basis: 100%; }
+.sh-vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media print { .atk-add { display: none; } }

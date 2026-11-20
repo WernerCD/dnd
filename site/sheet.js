@@ -127,7 +127,8 @@
       hp: p.hp == null ? null : int(p.hp, 0, 999), temp: int(p.temp, 0, 999) || 0, max: p.max == null ? null : int(p.max, 1, 999),
       slots: slots, pact: int(p.pact, 0, 9) || 0, res: o(p.res), ws: int(p.ws, 0, 20) || 0, hd: o(p.hd),
       cond: arr(p.cond).filter(function (c) { return CONDS.indexOf(c) >= 0; }), exh: int(p.exh, 0, 6) || 0,
-      ds: [int(arr(p.ds)[0], 0, 3) || 0, int(arr(p.ds)[1], 0, 3) || 0], conc: p.conc ? str(p.conc, 80) : null, t: p.t || 0
+      ds: [int(arr(p.ds)[0], 0, 3) || 0, int(arr(p.ds)[1], 0, 3) || 0], conc: p.conc ? str(p.conc, 80) : null, t: p.t || 0,
+      atk: arr(p.atk).filter(function (a) { return a && a.n; }).slice(0, 12).map(function (a) { return { n: str(a.n, 60), hit: a.hit == null || a.hit === '' ? null : int(a.hit, -10, 30), dmg: str(a.dmg, 60) }; })   // attacks added by hand
     };
   }
   function getPlay(id) { return norm(readPlay().chars[id]); }
@@ -241,6 +242,104 @@
     }).join('') + '</div>';
     var note = m.abFromPlanner ? '<p class="sh-note">Ability scores as entered in the planner (it doesn\'t add increases from feats or ASIs).</p>' : '<p class="sh-note">' + (m.P ? 'Scores from the shared character; the planner did not send final scores.' : 'Scores from the shared character, before any planned increases.') + (m.saves.length ? '' : ' Saving throw proficiencies come from the Multiclass Planner.') + '</p>';
     return card('ab', 'Abilities and saves', m.P ? src(m, 'planner') : '', h + note + (m.pbGuess ? '<p class="sh-note">Proficiency bonus worked out from the current total level.</p>' : ''));
+  }
+
+  // ---------- attacks ----------
+  // SRD weapon table (names and numbers only): die, damage type, simple/martial, properties
+  // F finesse, L light, T thrown, R ranged, 2 two-handed, H heavy, V<die> versatile. Edition differences in W24/W14.
+  var WEAP = {
+    'club': ['1d4', 'bludgeoning', 's', 'L'], 'dagger': ['1d4', 'piercing', 's', 'FLT'], 'greatclub': ['1d8', 'bludgeoning', 's', '2'],
+    'handaxe': ['1d6', 'slashing', 's', 'LT'], 'javelin': ['1d6', 'piercing', 's', 'T'], 'light hammer': ['1d4', 'bludgeoning', 's', 'LT'],
+    'mace': ['1d6', 'bludgeoning', 's', ''], 'quarterstaff': ['1d6', 'bludgeoning', 's', 'V1d8'], 'sickle': ['1d4', 'slashing', 's', 'L'],
+    'spear': ['1d6', 'piercing', 's', 'TV1d8'], 'light crossbow': ['1d8', 'piercing', 's', 'R2'], 'dart': ['1d4', 'piercing', 's', 'FT'],
+    'shortbow': ['1d6', 'piercing', 's', 'R2'], 'sling': ['1d4', 'bludgeoning', 's', 'R'],
+    'battleaxe': ['1d8', 'slashing', 'm', 'V1d10'], 'flail': ['1d8', 'bludgeoning', 'm', ''], 'glaive': ['1d10', 'slashing', 'm', 'H2'],
+    'greataxe': ['1d12', 'slashing', 'm', 'H2'], 'greatsword': ['2d6', 'slashing', 'm', 'H2'], 'halberd': ['1d10', 'slashing', 'm', 'H2'],
+    'lance': ['1d10', 'piercing', 'm', 'H'], 'longsword': ['1d8', 'slashing', 'm', 'V1d10'], 'maul': ['2d6', 'bludgeoning', 'm', 'H2'],
+    'morningstar': ['1d8', 'piercing', 'm', ''], 'pike': ['1d10', 'piercing', 'm', 'H2'], 'rapier': ['1d8', 'piercing', 'm', 'F'],
+    'scimitar': ['1d6', 'slashing', 'm', 'FL'], 'shortsword': ['1d6', 'piercing', 'm', 'FL'], 'trident': ['1d8', 'piercing', 'm', 'TV1d10'],
+    'war pick': ['1d8', 'piercing', 'm', 'V1d10'], 'warhammer': ['1d8', 'bludgeoning', 'm', 'V1d10'], 'whip': ['1d4', 'slashing', 'm', 'F'],
+    'blowgun': ['1d4', 'piercing', 'm', 'R'], 'hand crossbow': ['1d6', 'piercing', 'm', 'RL'], 'heavy crossbow': ['1d10', 'piercing', 'm', 'RH2'],
+    'longbow': ['1d8', 'piercing', 'm', 'RH2'], 'musket': ['1d12', 'piercing', 'm', 'R2'], 'pistol': ['1d10', 'piercing', 'm', 'R']
+  };
+  var W14 = { lance: ['1d12', 'piercing', 'm', ''], trident: ['1d6', 'piercing', 'm', 'TV1d8'], 'war pick': ['1d8', 'piercing', 'm', ''], blowgun: ['1', 'piercing', 'm', 'R'] };
+  var WNAMES = Object.keys(WEAP).sort(function (a, b) { return b.length - a.length; });
+  var MARTIAL_CLS = ['barbarian', 'fighter', 'paladin', 'ranger'];
+  var LIST14 = ['hand crossbow', 'longsword', 'rapier', 'shortsword'];   // 2014 bard and rogue martial weapons
+  function weaponOf(name, ed) {   // "+1 Longsword", "Longsword, +1", "Crossbow, Light", "Javelin of Lightning" -> base weapon
+    var t = String(name || '').toLowerCase(), b = /\+\s*([1-3])\b/.exec(t), bonus = b ? +b[1] : 0;
+    t = t.replace(/\+\s*[1-3]\b/g, ' ').replace(/\(.*?\)/g, ' ');
+    var parts = t.split(',').map(function (x) { return x.trim(); }).filter(Boolean);
+    if (parts.length === 2 && WEAP[parts[1] + ' ' + parts[0]]) t = parts[1] + ' ' + parts[0];   // "crossbow, light"
+    t = ' ' + t.replace(/[^a-z ]+/g, ' ').replace(/\s+/g, ' ') + ' ';
+    for (var i = 0; i < WNAMES.length; i++) if (t.indexOf(' ' + WNAMES[i] + ' ') >= 0) {
+      var k = WNAMES[i], w = (ed === '2014' && W14[k]) || WEAP[k];
+      return { key: k, die: w[0], type: w[1], cat: w[2], props: w[3], bonus: bonus };
+    }
+    return null;
+  }
+  function maDie(m) {   // monk Martial Arts die at the monk's level
+    var l = C.levelIn(m.ch, 'monk'); if (!l) return 0;
+    return m.ed === '2014' ? (l >= 17 ? 10 : l >= 11 ? 8 : l >= 5 ? 6 : 4) : (l >= 17 ? 12 : l >= 11 ? 10 : l >= 5 ? 8 : 6);
+  }
+  function weaponProf(m, w) {
+    if (w.cat === 's') return true;
+    var lv = function (c) { return C.levelIn(m.ch, c) > 0; };
+    if (MARTIAL_CLS.some(lv)) return true;
+    var txt = String(m.P && m.P.prof && m.P.prof.weapons || '').toLowerCase();
+    if (/martial/.test(txt) && !/martial weapons? (that|with)/.test(txt)) return true;
+    if (txt.indexOf(w.key) >= 0) return true;
+    if (m.ed === '2014') return (lv('rogue') || lv('bard')) && LIST14.indexOf(w.key) >= 0 || lv('monk') && w.key === 'shortsword';
+    return lv('rogue') && /[FL]/.test(w.props) || lv('monk') && /L/.test(w.props) && !/R/.test(w.props);
+  }
+  function dmgExpr(die, mod) { return die + (mod < 0 ? '-' + Math.abs(mod) : mod ? '+' + mod : ''); }
+  function dmgText(die, mod) { return die + (mod ? ' ' + (mod < 0 ? '&minus; ' : '+ ') + Math.abs(mod) : ''); }
+  function dmgRoll(expr, text, label) { return /d/.test(expr) ? '<span data-roll="' + esc(expr) + '" data-roll-label="' + esc(label) + '">' + text + '</span>' : text; }
+  function weaponRows(m) {
+    var IM = sum(m.ch, 'import'), seen = {}, out = [], ma = maDie(m);
+    var list = arr(IM && IM.items).filter(function (x) { return x && x.n; });
+    list.sort(function (a, b) { return (b.eq ? 1 : 0) - (a.eq ? 1 : 0); });
+    list.forEach(function (x) {
+      var w = weaponOf(x.n, m.ed); if (!w || out.length >= 10) return;
+      var key = String(x.n).toLowerCase(); if (seen[key]) return; seen[key] = 1;
+      var str_ = m.mod('str'), dex = m.mod('dex'), ranged = /R/.test(w.props);
+      var monkW = ma && !ranged && (m.ed === '2014' ? (w.cat === 's' && !/[H2]/.test(w.props)) || w.key === 'shortsword' : w.cat === 's' || /L/.test(w.props));
+      var ab = ranged ? dex : /F/.test(w.props) || monkW ? Math.max(str_, dex) : str_;
+      var prof = weaponProf(m, w), hit = ab + (prof ? m.pb : 0) + w.bonus, dm = ab + w.bonus, die = w.die;
+      if (monkW && /^1d(\d+)$/.test(die) && +RegExp.$1 < ma) die = '1d' + ma;
+      var v = /V(\d*d\d+)/.exec(w.props), notes = [];
+      if (/F/.test(w.props)) notes.push('finesse'); if (/L/.test(w.props)) notes.push('light'); if (/T/.test(w.props)) notes.push('thrown');
+      if (/2/.test(w.props)) notes.push('two-handed'); if (/H/.test(w.props)) notes.push('heavy');
+      if (!prof) notes.push('not proficient');
+      if (x.eq === false) notes.push('carried');
+      out.push({ n: str(x.n, 60), hit: hit, dmg: dmgRoll(dmgExpr(die, dm), dmgText(die, dm), str(x.n, 60) + ' damage') + ' ' + w.type +
+        (v ? ' <span class="muted small">(two hands ' + dmgRoll(dmgExpr(v[1], dm), dmgText(v[1], dm), str(x.n, 60) + ' damage, two hands') + ')</span>' : ''), note: notes.join(', ') });
+    });
+    // unarmed strike: 1 + Strength (monks: Martial Arts die + Str or Dex)
+    var ua = ma ? Math.max(m.mod('str'), m.mod('dex')) : m.mod('str');
+    out.push({ n: 'Unarmed strike', hit: ua + m.pb, dmg: ma ? dmgRoll(dmgExpr('1d' + ma, ua), dmgText('1d' + ma, ua), 'Unarmed strike damage') + ' bludgeoning' : Math.max(0, 1 + ua) + ' bludgeoning', note: ma ? 'Martial Arts' : '' });
+    return out;
+  }
+  function attacks(m, p) {
+    var rows = weaponRows(m), mine = p.atk, IM = sum(m.ch, 'import');
+    var tr = function (r, i) {
+      return '<tr><th scope="row">' + esc(r.n) + (r.note ? ' <span class="muted small">' + esc(r.note) + '</span>' : '') + '</th><td>' + (r.hit == null ? '&ndash;' : rl(r.hit, r.n + ' attack')) + '</td><td>' + r.dmg + '</td>' +
+        (i == null ? '<td></td>' : '<td><button type="button" class="link danger" data-a="atk-del" data-i="' + i + '" data-k="atk-del' + i + '" aria-label="Remove ' + esc(r.n) + '">Remove</button></td>') + '</tr>';
+    };
+    var own = mine.map(function (a, i) {
+      var d = /^\s*(\d*d\d+(?:\s*[+-]\s*\d+)?)\s*(.*)$/i.exec(a.dmg), expr = d ? d[1].replace(/\s+/g, '') : '';
+      return tr({ n: a.n, hit: a.hit, dmg: d ? dmgRoll(expr, esc(d[1]), a.n + ' damage') + (d[2] ? ' ' + esc(d[2]) : '') : esc(a.dmg) || '&ndash;' }, i);
+    });
+    var h = '<div class="tw"><table class="forms atk"><thead><tr><th scope="col">Attack</th><th scope="col">To hit</th><th scope="col">Damage</th><th scope="col"><span class="sh-vh">Remove</span></th></tr></thead><tbody>' +
+      rows.map(function (r) { return tr(r); }).join('') + own.join('') + '</tbody></table></div>' +
+      '<form class="atk-add" data-a="atk-form"><span class="sh-lbl">Add an attack</span>' +
+      '<input id="atkN" maxlength="60" placeholder="Name" aria-label="Attack name" required>' +
+      '<input id="atkH" type="number" min="-10" max="30" placeholder="To hit" aria-label="To hit bonus">' +
+      '<input id="atkD" maxlength="60" placeholder="Damage, e.g. 1d8+3 fire" aria-label="Damage">' +
+      '<button type="submit" class="btn">Add</button></form>' +
+      '<p class="sh-note">' + (IM ? 'Weapons from the imported sheet, with ability, proficiency and +1/+2/+3 bonuses. ' : 'Import the character from D&amp;D Beyond (or Foundry, Fight Club 5, DiceCloud) to list its weapons. ') +
+      'Fighting styles, feats and other features are not added; add your own attack for those. Added attacks are kept in this browser.</p>';
+    return card('atk', 'Attacks', '', h, true);
   }
 
   function spellcasting(m, p) {
@@ -391,7 +490,7 @@
     document.title = ch.name + ' · Character Sheet · D&D Toolbox';
     var m = model(ch), p = getPlay(ch.id);
     main.innerHTML = topBlock(m, p) +
-      '<div class="sh-grid">' + vitals(m, p) + conditions(m, p) + abilities(m) + defenses(m) + resources(m, p) +
+      '<div class="sh-grid">' + vitals(m, p) + conditions(m, p) + abilities(m) + attacks(m, p) + defenses(m) + resources(m, p) +
       (m.druid ? wildshape(m, p) : '') + (m.caster ? spellcasting(m, p) : '') + featsFeatures(m) + items(m) + '</div>' +
       '<p class="sh-foot muted small">Play tracking (HP, slots, conditions) is saved in this browser only. ' +
       '<a href="party.html">Party view</a> &middot; <button type="button" class="link" data-a="print">Print this sheet</button> &middot; <button type="button" class="link danger" data-a="reset">Clear play tracking</button></p>';
@@ -468,8 +567,15 @@
       var r1 = m.res[+b.getAttribute('data-r')]; if (!r1) return;
       setPlay(id, function (p) { var u = Math.max(0, Math.min(r1.max, (p.res[r1.name] || 0) + (a === 'resn-' ? 1 : -1))); if (u) p.res[r1.name] = u; else delete p.res[r1.name]; });
     } else if (a === 'short' || a === 'long') rest(a);
+    else if (a === 'atk-del') { var ai = +b.getAttribute('data-i'); setPlay(id, function (p) { p.atk.splice(ai, 1); }); }
     else if (a === 'print') window.print();
-    else if (a === 'reset') { if (confirm('Clear HP, slots used, conditions and death saves for ' + cur.name + '? The plans in the tools are not touched.')) { undo = { id: id, prev: getPlay(id) }; setPlay(id, function (p) { var o = norm({ max: p.max }); for (var k in o) p[k] = o[k]; }); toast('Play tracking cleared.', true); } }
+    else if (a === 'reset') { if (confirm('Clear HP, slots used, conditions and death saves for ' + cur.name + '? The plans in the tools are not touched.')) { undo = { id: id, prev: getPlay(id) }; setPlay(id, function (p) { var o = norm({ max: p.max, atk: p.atk }); for (var k in o) p[k] = o[k]; }); toast('Play tracking cleared.', true); } }
+  });
+  main.addEventListener('submit', function (e) {
+    if (!cur || !e.target.matches('.atk-add')) return; e.preventDefault();
+    var n = $('atkN').value.trim(), hv = $('atkH').value, d = $('atkD').value.trim(); if (!n) { $('atkN').focus(); return; }
+    setPlay(cur.id, function (p) { p.atk.push({ n: n, hit: hv === '' ? null : hv, dmg: d }); p.atk = norm(p).atk; });
+    var f = $('atkN'); if (f) f.focus();
   });
   main.addEventListener('input', function (e) { if (e.target.id === 'hpAmt') amt = e.target.value; });
   main.addEventListener('keydown', function (e) { if (e.target.id === 'hpAmt' && e.key === 'Enter') { e.preventDefault(); var d = main.querySelector('[data-a="dmg"]'); if (d) d.click(); } });
